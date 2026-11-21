@@ -1,0 +1,56 @@
+{% extends 'admin/base.html' %}
+{% block title %}Messages{% endblock %}
+{% block page_title %}Contact Messages{% endblock %}
+
+{% block content %}
+<div class="panel">
+  <div class="panel-head">
+    <h2><i class="fa fa-envelope" style="color:var(--accent);margin-right:6px;"></i> Messages from the contact form ({{ items|length }})</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Received</th>
+          <th>From</th>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for m in items %}
+        <tr>
+          <td style="white-space:nowrap;">{{ m.created_at.strftime('%d %b %Y, %H:%M') if m.created_at else '—' }}</td>
+          <td>
+            <strong>{{ m.name }}</strong><br>
+            <a href="mailto:{{ m.email }}">{{ m.email }}</a>
+            {% if m.phone %}<br><small>{{ m.phone }}</small>{% endif %}
+          </td>
+          <td>{{ m.subject or '—' }}</td>
+          <td style="max-width:420px;white-space:pre-wrap;word-break:break-word;">{{ m.message }}</td>
+          <td>
+            <form method="post" style="display:inline" onsubmit="return confirm('Delete this message?');">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ m.id }}">
+              <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" style="text-align:center;padding:28px;color:var(--muted);">No messages yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+if (typeof checkoutMessages === 'function') {
+  checkoutMessages();
+}
+</script>
+{% endblock %}

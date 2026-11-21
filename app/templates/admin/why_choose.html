@@ -1,0 +1,91 @@
+{% extends 'admin/base.html' %}
+{% block title %}Why Choose Us{% endblock %}
+{% block page_title %}Why choose us{% endblock %}
+
+{% block content %}
+<div class="panel">
+  <div class="panel-head">
+    <h2><i class="fa fa-star" style="color:var(--accent);margin-right:6px;"></i> Add Feature Item</h2>
+  </div>
+  <div class="panel-body">
+    <form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add">
+      <div class="form-grid">
+        <div class="full">
+          <label>Title <span style="color:var(--danger)">*</span></label>
+          <input name="title" required placeholder="e.g. Expert Faculty &amp; Modern Labs">
+        </div>
+        <div class="full">
+          <label>Content Description</label>
+          <textarea name="content" placeholder="Feature explanation, benefits for students..."></textarea>
+        </div>
+        <div>
+          <label>Icon Class (e.g. zmdi-accounts, zmdi-graduation-cap)</label>
+          <input name="icon" value="zmdi-accounts" placeholder="zmdi-accounts">
+        </div>
+        <div>
+          <label>Display Order</label>
+          <input type="number" name="order" value="0">
+        </div>
+        <div class="full">
+          <button class="btn btn-primary" type="submit"><i class="fa fa-plus"></i> Add Item</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>Why Choose Items ({{ items|length }})</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Icon</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for item in items %}
+        <tr>
+          <td><strong>{{ item.title }}</strong></td>
+          <td><code>{{ item.icon }}</code></td>
+          <td><span style="font-size:12px;color:var(--muted);">{{ item.content[:80] }}{% if item.content|length > 80 %}...{% endif %}</span></td>
+          <td>
+            {% if item.is_active %}
+            <span class="badge badge-ok">Active</span>
+            {% else %}
+            <span class="badge badge-off">Hidden</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="actions">
+              <form method="post" style="display:inline">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="toggle">
+                <input type="hidden" name="id" value="{{ item.id }}">
+                <button class="btn btn-sm btn-warn" type="submit">Show/Hide</button>
+              </form>
+              <form method="post" style="display:inline" onsubmit="return confirm('Delete this item?')">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="id" value="{{ item.id }}">
+                <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">No features configured yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

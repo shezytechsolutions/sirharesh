@@ -1,0 +1,178 @@
+{% extends 'admin/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="dash-analytics">
+  <div class="analytics-head">
+    <div>
+      <h2 class="section-title" style="margin:0">Visitor analytics</h2>
+      <p class="muted" style="margin:4px 0 0">Live traffic for the last 24 hours · auto-refreshes every 5s</p>
+    </div>
+    <div class="analytics-stats">
+      <div class="mini-stat">
+        <span class="mini-num" id="statVisitsToday">{{ stats.visits_today }}</span>
+        <span class="mini-label">Visits (24h)</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-num" id="statUniqueToday">{{ stats.unique_ips_today }}</span>
+        <span class="mini-label">Unique IPs (24h)</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-num" id="statVisitsWeek">{{ stats.visits_week }}</span>
+        <span class="mini-label">Visits (7d)</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-num" id="statVisitsTotal">{{ stats.visits_total }}</span>
+        <span class="mini-label">All-time visits</span>
+      </div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <canvas id="visitsChart" height="110" aria-label="Visits per hour chart"></canvas>
+  </div>
+</section>
+
+<section class="dash-grid-two">
+  <div class="card-panel">
+    <div class="panel-head">
+      <h3>Recent visits</h3>
+      
+    </div>
+    <div class="table-wrap">
+      <table class="data-table" id="visitsTable">
+        <colgroup>
+          <col style="width: 155px;">
+          <col style="width: 130px;">
+          <col style="width: 135px;">
+          <col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Time (UTC)</th>
+            <th>IP address</th>
+            <th>Page</th>
+            <th>Browser</th>
+          </tr>
+        </thead>
+        <tbody id="visitsBody">
+          {% for v in recent_visits %}
+          <tr>
+            <td>{{ v.created_at.strftime('%Y-%m-%d %H:%M:%S') if v.created_at else '—' }}</td>
+            <td><code class="ip-code">{{ v.ip }}</code></td>
+            <td class="path-cell" title="{{ v.path }}">{{ v.path }}</td>
+            <td class="ua-cell" title="{{ v.user_agent or '' }}">{{ (v.user_agent or '—')[:48] }}{% if v.user_agent and v.user_agent|length > 48 %}…{% endif %}</td>
+          </tr>
+          {% else %}
+          <tr class="empty-row"><td colspan="4">No visits recorded yet. Open the public site to start logging.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card-panel">
+    <div class="panel-head">
+      <h3>Content overview</h3>
+    </div>
+    <div class="tile-grid compact">
+      <a class="tile" href="{{ url_for('admin.admin_news') }}"><span class="tile-icon"><i class="fa fa-newspaper"></i></span><span><div class="tile-num">{{ stats.news }}</div><div class="tile-label">News</div></span></a>
+      <a class="tile" href="{{ url_for('admin.admin_courses') }}"><span class="tile-icon"><i class="fa fa-graduation-cap"></i></span><span><div class="tile-num">{{ stats.courses }}</div><div class="tile-label">Courses</div></span></a>
+      <a class="tile" href="{{ url_for('admin.admin_upcoming_courses') }}"><span class="tile-icon"><i class="fa fa-calendar-plus"></i></span><span><div class="tile-num">{{ stats.upcoming }}</div><div class="tile-label">Upcoming</div></span></a>
+      <a class="tile" href="{{ url_for('admin.admin_events') }}"><span class="tile-icon"><i class="fa fa-calendar-days"></i></span><span><div class="tile-num">{{ stats.events }}</div><div class="tile-label">Events</div></span></a>
+      <a class="tile" href="{{ url_for('admin.admin_elibrary') }}"><span class="tile-icon"><i class="fa fa-book"></i></span><span><div class="tile-num">{{ stats.books }}</div><div class="tile-label">Books</div></span></a>
+      <a class="tile" href="{{ url_for('admin.admin_learning_videos') }}"><span class="tile-icon"><i class="fa fa-video"></i></span><span><div class="tile-num">{{ stats.videos }}</div><div class="tile-label">Videos</div></span></a>
+      <a class="tile" href="{{ url_for('admin.admin_team') }}"><span class="tile-icon"><i class="fa fa-users"></i></span><span><div class="tile-num">{{ stats.team }}</div><div class="tile-label">Team</div></span></a>
+      <a class="tile" href="{{ url_for('admin.admin_messages') }}"><span class="tile-icon"><i class="fa fa-envelope"></i></span><span><div class="tile-num">{{ stats.messages }}</div><div class="tile-label">Messages</div></span></a>
+    </div>
+  </div>
+</section>
+
+<p class="legal-note"></p>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+  var labels = {{ chart_labels|tojson }};
+  var counts = {{ chart_counts|tojson }};
+  var ctx = document.getElementById('visitsChart');
+  if (!ctx || typeof Chart === 'undefined') return;
+
+  var chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Visits',
+        data: counts,
+        borderColor: '#1F3971',
+        backgroundColor: 'rgba(31, 57, 113, 0.12)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12, color: '#64748b', font: { size: 11 } }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0, color: '#64748b', font: { size: 11 } },
+          grid: { color: 'rgba(226, 232, 240, 0.9)' }
+        }
+      }
+    }
+  });
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; });
+  }
+
+  function refreshAnalytics() {
+    fetch('{{ url_for("admin.admin_api_analytics") }}', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin'
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      document.getElementById('statVisitsToday').textContent = data.visits_today;
+      if (document.getElementById('statVisitsWeek') && data.visits_week !== undefined) {
+        document.getElementById('statVisitsWeek').textContent = data.visits_week;
+      }
+      document.getElementById('statUniqueToday').textContent = data.unique_ips_today;
+      document.getElementById('statVisitsTotal').textContent = data.visits_total;
+      chart.data.labels = data.chart_labels;
+      chart.data.datasets[0].data = data.chart_counts;
+      chart.update('none');
+      var body = document.getElementById('visitsBody');
+      if (!data.recent || !data.recent.length) {
+        body.innerHTML = '<tr class="empty-row"><td colspan="4">No visits recorded yet.</td></tr>';
+        return;
+      }
+      body.innerHTML = data.recent.map(function(v){
+        var ua = v.ua || '—';
+        if (ua.length > 48) ua = ua.slice(0, 48) + '…';
+        return '<tr><td>' + escapeHtml(v.at) + '</td><td><code class="ip-code">' + escapeHtml(v.ip) + '</code></td>' +
+          '<td class="path-cell" title="' + escapeHtml(v.path) + '">' + escapeHtml(v.path) + '</td>' +
+          '<td class="ua-cell" title="' + escapeHtml(v.ua || '') + '">' + escapeHtml(ua) + '</td></tr>';
+      }).join('');
+    })
+    .catch(function(){});
+  }
+  setInterval(refreshAnalytics, 5000);
+})();
+</script>
+{% endblock %}

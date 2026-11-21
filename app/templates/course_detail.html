@@ -1,0 +1,132 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{{ item.title }} - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/pages/course_detail-5.css') }}">
+</head>
+<body>
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
+    </div>
+    <div class="as-mainwrapper">
+        <div class="bg-white">
+            {% include 'includes/header.html' %}
+
+            <div class="course-detail-wrap">
+                <div class="course-detail-container">
+                    <div class="course-detail-layout">
+                        <!-- Main Content -->
+                        <div class="course-detail-main">
+                            <div class="detail-section-card">
+                                <!-- 1. Book TITLE (no banner, no poster, no meta pills) -->
+                                <div class="book-title-block">
+                                    <h1 class="book-title">{{ item.title }}</h1>
+                                </div>
+
+                                <!-- 2. PDF viewer (browser built-in, served by /course-pdf/<id>) -->
+                                {% if item.pdf %}
+                                <div class="pdf-window-container">
+                                    <div class="pdf-window-topper">
+                                        <div class="pdf-circle-container">
+                                            <span class="pdf-circle dot-red"></span>
+                                            <span class="pdf-circle dot-yellow"></span>
+                                            <span class="pdf-circle dot-green"></span>
+                                        </div>
+                                        <div class="pdf-topper-title">
+                                            <i class="fa fa-file-pdf"></i>
+                                            <span>{{ item.title }} - Syllabus &amp; Reader</span>
+                                        </div>
+                                        <span class="pdf-badge-status"><i class="fa fa-circle"></i> PDF Viewer</span>
+                                    </div>
+                                    <div class="pdf-frame-wrap">
+                                        <iframe src="{{ pdf_url or item.pdf }}"
+                                                title="{{ item.title }} - Syllabus PDF">
+                                        </iframe>
+                                    </div>
+                                    <div class="pdf-window-footer">
+                                        <span class="pdf-footer-hint"><i class="zmdi zmdi-info"></i> Use the toolbar inside the viewer to zoom, search, print or navigate pages.</span>
+                                        <a href="{{ pdf_download_url or item.pdf }}" download class="pdf-download-btn">
+                                            <i class="fa fa-download"></i> Download PDF
+                                        </a>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="pdf-placeholder">
+                                    <i class="zmdi zmdi-file-text"></i>
+                                    <h4>Curriculum &amp; Syllabus Document</h4>
+                                    <p>The detailed course syllabus and outline will be uploaded soon. You may contact our admissions desk for immediate syllabus queries.</p>
+                                    <a href="{{ url_for('public.contact') }}" class="pdf-action-btn">Inquire at Admissions Desk</a>
+                                </div>
+                                {% endif %}
+
+                                <!-- 3. Author & description -->
+                                <div class="author-desc-block">
+                                    <h3 class="author-section-heading">Course Instructor &amp; Description</h3>
+                                    {% if item.teacher %}
+                                    <div class="instructor-strip">
+                                        <img src="{{ item.teacher_image or url_for('static', filename='img/teacher/1.png') }}" alt="{{ item.teacher }}" loading="lazy" decoding="async">
+                                        <div>
+                                            <strong>{{ item.teacher }}</strong>
+                                            <span>{{ item.teacher_role or 'Professor' }}</span>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="course-description-content">{{ item.description or '' }}</div>
+
+                                    <div>
+                                        <a href="{{ url_for('public.courses') }}" class="course-back-btn">
+                                            <i class="zmdi zmdi-chevron-left"></i> Back to Courses
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Side: Other courses — up to 20 cards, same design on all screens -->
+                        <div class="course-detail-side">
+                            <span class="side-div-title">Other Courses</span>
+                            {% if related %}
+                                {% for c in related[:20] %}
+                                <div class="side-course-card">
+                                    <div class="side-course-thumb-wrap">
+                                        <a href="{{ url_for('public.course_detail', course_id=c.id) }}">
+                                            <img class="side-course-thumb" src="{{ c.image or url_for('static', filename='img/course/1.jpg') }}" alt="{{ c.title }}" loading="lazy" decoding="async">
+                                        </a>
+                                    </div>
+                                    <div class="side-course-body">
+                                        <a href="{{ url_for('public.course_detail', course_id=c.id) }}" class="side-course-title">{{ c.title }}</a>
+                                        <a href="{{ url_for('public.course_detail', course_id=c.id) }}" class="side-course-btn">View</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="side-course-card">
+                                    <div class="side-course-body text-center">
+                                        <p style="font-size:11px;color:#6b7280;margin:0;">No other courses</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+    {% include 'includes/scripts.html' %}
+</body>
+</html>

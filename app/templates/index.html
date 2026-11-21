@@ -1,0 +1,753 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>AIMS SUKKUR ACADEMY</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+
+    <!-- favicon
+		============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+    <!-- Bootstrap CSS
+		============================================ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+
+    <!-- Fontawsome CSS
+		============================================ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+
+    <!-- Metarial Iconic Font CSS
+		============================================ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+
+    <!-- Plugin CSS
+		============================================ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+
+    <!-- Style CSS
+		============================================ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}">
+
+    <!-- Responsive CSS
+		============================================ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}">
+</head>
+
+<body>
+    <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <!--Loading Area Start-->
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <!--Loading Area End-->
+    <!--Main Wrapper Start-->
+    <div class="as-mainwrapper">
+        <!--Bg White Start-->
+        <div class="bg-white">
+            <!--Header Area Start-->
+            {% include 'includes/header.html' %}
+            <!--End of Header Area-->
+
+            <!--About Area Start-->
+            <div class="about-hero-area reveal-on-scroll">
+                <div class="about-hero-bg" style="background-image: linear-gradient(135deg, rgba(31, 57, 113, 0.78) 0%, rgba(42, 74, 138, 0.72) 50%, rgba(31, 57, 113, 0.82) 100%), url('{{ settings.get('home_about_bg') or url_for('static', filename='img/banner/back.jpg') }}');"></div>
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-md-12">
+                            <div class="about-hero-content">
+                                {% if settings.get('home_about_badge') %}
+                                <span class="about-hero-badge" style="display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(255,255,255,0.18);color:#fff;font-size:12px;font-weight:600;margin-bottom:12px;letter-spacing:0.5px;">{{ settings.get('home_about_badge') }}</span>
+                                {% endif %}
+                                <h2 class="about-hero-title">{{ settings.get('home_about_title') or 'Building Futures Through Quality Education' }}</h2>
+                                <p class="about-hero-text">
+                                    {{ settings.get('home_about_text') or 'Join AIMS Sukkur — a leading institution where innovation meets education. Discover programs designed for tomorrow’s challenges and grow with expert faculty.' }}
+                                </p>
+                                <a href="{{ settings.get('home_about_btn_link') or url_for('public.courses', _anchor='upcoming-courses') }}" class="about-hero-btn">{{ settings.get('home_about_btn_text') or 'Apply Now – Start Your Journey' }}</a>
+                                <div class="about-hero-stats">
+                                    <div class="about-stat-item">
+                                        <div class="about-stat-icon"><i class="zmdi zmdi-graduation-cap"></i></div>
+                                        <div>
+                                            <h4>{{ settings.get('home_about_stat1_num') or '1200+' }}</h4>
+                                            <span>{{ settings.get('home_about_stat1_lbl') or 'Students' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="about-stat-item">
+                                        <div class="about-stat-icon"><i class="zmdi zmdi-accounts"></i></div>
+                                        <div>
+                                            <h4>{{ settings.get('home_about_stat2_num') or '79+' }}</h4>
+                                            <span>{{ settings.get('home_about_stat2_lbl') or 'Teachers' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="about-stat-item">
+                                        <div class="about-stat-icon"><i class="zmdi zmdi-library"></i></div>
+                                        <div>
+                                            <h4>{{ settings.get('home_about_stat3_num') or '36+' }}</h4>
+                                            <span>{{ settings.get('home_about_stat3_lbl') or 'Courses' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <div class="about-hero-image">
+                                <img src="{{ settings.get('home_about_img') or url_for('static', filename='img/about/asad.png') }}" alt="AIMS Sukkur Student" loading="lazy" decoding="async">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End of About Area-->
+            <!--Course Area Start-->
+            <div class="course-area section-padding reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title-wrapper">
+                                <div class="section-title">
+                                    <h3>POPULAR COURSES</h3>
+                                    <p>There are many variations of passages of Lorem Ipsum</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row course-grid-row home-course-grid">
+                        {% if home_courses %}
+                        {% for c in home_courses %}
+                        <div class="col-lg-4 col-md-6 col-6">
+                            <div class="single-item">
+                                <div class="single-item-image">
+                                    <a href="{{ url_for('public.course_detail', course_id=c.id) }}">
+                                        <img src="{{ c.image or '/static/img/course/1.jpg' }}" alt="{{ c.title }}" loading="lazy" decoding="async">
+                                    </a>
+                                </div>
+                                <div class="single-item-text">
+                                    <h4><a href="{{ url_for('public.course_detail', course_id=c.id) }}">{{ c.title }}</a></h4>
+                                    <p>{{ c.description or '' }}</p>
+                                    <a href="{{ url_for('public.course_detail', course_id=c.id) }}" class="course-btn">View Course</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-12 text-center">
+                            <p>No courses yet.</p>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-12 col-sm-12 course-more-wrap">
+                            <a href="{{ url_for('public.courses') }}" class="button-default button-large">Browse All Courses <i
+                                    class="zmdi zmdi-chevron-right"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--End of Course Area-->
+            <!--Fun Factor Area Start-->
+            <div class="fun-factor-area reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        {% if fun_factors %}
+                        {% for ff in fun_factors %}
+                        <div class="col-lg-3 col-md-6 col-12">
+                            <div class="single-fun-factor mb-30">
+                                <h2><span class="counter">{{ ff.number }}</span>+</h2>
+                                <h4>{{ ff.label }}</h4>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-lg-3 col-md-6 col-12">
+                            <div class="single-fun-factor mb-30">
+                                <h2><span class="counter">79</span>+</h2>
+                                <h4>Teachers</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-12">
+                            <div class="single-fun-factor mb-30">
+                                <h2><span class="counter">120</span>+</h2>
+                                <h4>Members</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-12">
+                            <div class="single-fun-factor mb-30">
+                                <h2><span class="counter">36</span>+</h2>
+                                <h4>Courses</h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-12">
+                            <div class="single-fun-factor mb-30">
+                                <h2><span class="counter">20</span>+</h2>
+                                <h4>Countries</h4>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!--End of Fun Factor Area-->
+
+
+            <!-- What's Happening: Events + News -->
+            <div class="happening-area section-padding reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <div class="section-title happening-title">
+                                <h3>What's Happening at AIMS</h3>
+                                <p>Stay updated with the latest events and news from our campus</p>
+                            </div>
+                            <div class="happening-tabs">
+                                <button type="button" class="happen-tab active" data-tab="events">Events</button>
+                                <button type="button" class="happen-tab" data-tab="news">News</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="happen-panel active" id="panel-events">
+                        <div class="row happen-grid">
+                            {% if home_events %}
+                            {% for e in home_events %}
+                            <div class="col-lg-4 col-md-6 col-6">
+                                <div class="happen-card">
+                                    <div class="happen-img">
+                                        <a href="{{ url_for('public.event_detail', event_id=e.id) }}">
+                                            <img src="{{ e.image or '/static/img/event/1.jpg' }}" alt="{{ e.title }}" loading="lazy" decoding="async">
+                                        </a>
+                                    </div>
+                                    <div class="happen-body">
+                                        {% if e.date %}
+                                        <span class="news-date"><i class="zmdi zmdi-calendar-check"></i> {{ e.date }}{%
+                                            if e.time %} · {{ e.time }}{% endif %}</span>
+                                        {% endif %}
+                                        <h4><a href="{{ url_for('public.event_detail', event_id=e.id) }}">{{ e.title }}</a>
+                                        </h4>
+                                        <p>{{ e.content[:140] }}{% if e.content|length > 140 %}...{% endif %}</p>
+                                        <a href="{{ url_for('public.event_detail', event_id=e.id) }}" class="happen-btn">View Event</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <div class="col-12 text-center">
+                                <p>No events yet.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-center" style="margin-top:10px;">
+                                <a href="{{ url_for('public.events') }}" class="button-default button-large">View All Events <i
+                                        class="zmdi zmdi-chevron-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="happen-panel" id="panel-news">
+                        <div class="row happen-grid">
+                            {% if home_news %}
+                            {% for n in home_news %}
+                            <div class="col-lg-4 col-md-6 col-6">
+                                <div class="happen-card">
+                                    <div class="happen-img">
+                                        <a href="{{ url_for('public.news_detail', news_id=n.id) }}">
+                                            <img src="{{ n.image or '/static/img/latest/1.jpg' }}" alt="{{ n.title }}" loading="lazy" decoding="async">
+                                        </a>
+                                    </div>
+                                    <div class="happen-body">
+                                        {% if n.date %}
+                                        <span class="news-date"><i class="zmdi zmdi-calendar-check"></i> {{ n.date
+                                            }}</span>
+                                        {% endif %}
+                                        <h4><a href="{{ url_for('public.news_detail', news_id=n.id) }}">{{ n.title }}</a></h4>
+                                        <p>{{ n.content[:140] }}{% if n.content|length > 140 %}...{% endif %}</p>
+                                        <a href="{{ url_for('public.news_detail', news_id=n.id) }}" class="happen-btn">Read
+                                            More</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <div class="col-12 text-center">
+                                <p>No news yet.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-center" style="margin-top:10px;">
+                                <a href="{{ url_for('public.news') }}" class="button-default button-large">View All News <i
+                                        class="zmdi zmdi-chevron-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- End What's Happening -->
+
+            <!-- E-Library Area -->
+            <div class="course-area section-padding bg-white reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title-wrapper">
+                                <div class="section-title">
+                                    <h3>E-LIBRARY</h3>
+                                    <p>Browse our digital collection of books and resources</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row course-grid-row elibrary-grid">
+                        {% if home_books %}
+                        {% for b in home_books %}
+                        <div class="col-lg-3 col-md-6 col-6 mb-30">
+                            <div class="single-item elibrary-item">
+                                <div class="single-item-image overlay-effect">
+                                    <a href="{{ url_for('public.book_detail', book_id=b.id) }}">
+                                        <img src="{{ b.image or '/static/img/product/16.jpg' }}" alt="{{ b.title }}" loading="lazy" decoding="async">
+                                    </a>
+                                </div>
+                                <div class="single-item-text">
+                                    <h4><a href="{{ url_for('public.book_detail', book_id=b.id) }}">{{ b.title }}</a></h4>
+                                    <ul class="elibrary-meta">
+                                        {% if b.author %}<li><i class="zmdi zmdi-account"></i> {{ b.author }}</li>{%
+                                        endif %}
+                                        {% if b.pages %}<li><i class="zmdi zmdi-file-text"></i> {{ b.pages }}</li>{%
+                                        endif %}
+                                    </ul>
+                                    <a href="{{ url_for('public.book_detail', book_id=b.id) }}"
+                                        class="happen-btn elibrary-btn">View Book</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-12 text-center">
+                            <p>No books yet.</p>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-12 col-sm-12 course-more-wrap">
+                            <a href="{{ url_for('public.elibrary') }}" class="button-default button-large">Browse Full Library
+                                <i class="zmdi zmdi-chevron-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End E-Library Area -->
+            <!--Testimonial Area Start-->
+            <div class="testimonial-area section-padding reveal-on-scroll" style="background:#f7f8fa;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title-wrapper">
+                                <div class="section-title">
+                                    <h3>ALUMNI SUCCESS</h3>
+                                    <p>Stories from graduates building better futures</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-slider-wrap">
+                        <div class="testimonial-card-slider owl-carousel">
+                            {% if testimonials %}
+                            {% for t in testimonials %}
+                            <div class="t-card">
+                                <span class="t-badge">Alumni Success</span>
+                                <p class="t-quote">"{{ t.content }}"</p>
+                                <div class="t-foot">
+                                    <img src="{{ t.image or url_for('static', filename='img/testimonial/testimonial1.png') }}" alt="{{ t.author }}" onerror="this.src='{{ url_for('static', filename='img/testimonial/testimonial1.png') }}'" loading="lazy" decoding="async">
+                                    <div>
+                                        <strong>{{ t.author }}</strong>
+                                        <span>Alumni / Graduate</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <div class="t-card">
+                                <span class="t-badge">Alumni Success</span>
+                                <p class="t-quote">"AIMS Sukkur shaped my career path. The practical teaching
+                                    and
+                                    supportive faculty helped me grow into a confident professional in my
+                                    field."</p>
+                                <div class="t-foot">
+                                    <img src="{{ url_for('static', filename='img/testimonial/testimonial1.png') }}" alt="" loading="lazy" decoding="async">
+                                    <div>
+                                        <strong>Ahmed Khan</strong>
+                                        <span>Software Engineer</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="t-card">
+                                <span class="t-badge">Alumni Success</span>
+                                <p class="t-quote">"Studying at AIMS Sukkur while managing work was challenging,
+                                    but the
+                                    flexible programs and quality education made success possible for me."</p>
+                                <div class="t-foot">
+                                    <img src="{{ url_for('static', filename='img/testimonial/testimonial2.png') }}" alt="" loading="lazy" decoding="async">
+                                    <div>
+                                        <strong>Sara Ali</strong>
+                                        <span>Business Analyst</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="t-card">
+                                <span class="t-badge">Alumni Success</span>
+                                <p class="t-quote">"My time at AIMS Sukkur laid a strong foundation for my HR
+                                    career.
+                                    Faculty shared real insights, not only theory, which I use every day."</p>
+                                <div class="t-foot">
+                                    <img src="{{ url_for('static', filename='img/testimonial/testimonial3.png') }}" alt="" loading="lazy" decoding="async">
+                                    <div>
+                                        <strong>Fatima Zahra</strong>
+                                        <span>HR Professional</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="t-card">
+                                <span class="t-badge">Alumni Success</span>
+                                <p class="t-quote">"From campus to career, AIMS Sukkur prepared me well. Strong
+                                    academics and guidance helped me step into leadership with confidence."</p>
+                                <div class="t-foot">
+                                    <img src="{{ url_for('static', filename='img/testimonial/testimonial4.png') }}" alt="" loading="lazy" decoding="async">
+                                    <div>
+                                        <strong>Hassan Raza</strong>
+                                        <span>Project Manager</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Testimonial Area End-->
+
+
+            <!-- Video Learning Area -->
+            <div class="video-learn-area section-padding reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title-wrapper">
+                                <div class="section-title">
+                                    <h3>Learning Videos</h3>
+                                    <p>Watch helpful lectures and tutorials embedded from YouTube</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row video-grid">
+                        {% if home_videos %}
+                            {% for v in home_videos %}
+                            <div class="col-lg-3 col-md-6 col-6">
+                                <div class="learning-video-card" style="margin-bottom:20px;"
+                                     data-video-id="{{ v.resolved_video_id }}"
+                                     data-title="{{ v.title }}"
+                                     data-category="{{ v.category or 'Lecture' }}"
+                                     data-instructor="{{ v.instructor or '' }}"
+                                     data-duration="{{ v.duration or '' }}"
+                                     data-description="{{ v.description or '' }}">
+                                    <div class="lv-thumb-wrap open-home-video-trigger" title="Click to watch video">
+                                        <img src="{{ v.thumbnail_url }}" alt="{{ v.title }}" class="lv-thumb-img" onerror="this.src='https://img.youtube.com/vi/{{ v.resolved_video_id }}/mqdefault.jpg'" loading="lazy" decoding="async">
+                                        {% if v.duration %}
+                                        <span class="lv-badge-dur"><i class="fa fa-clock-o"></i> {{ v.duration }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="lv-body" style="padding:12px 14px 14px;">
+                                        <h4 class="lv-title open-home-video-trigger" style="font-size:14px;margin-bottom:6px;" title="{{ v.title }}">{{ v.title }}</h4>
+                                        {% if v.instructor %}
+                                        <div class="lv-meta" style="font-size:11.5px;margin-bottom:0;">
+                                            <i class="fa fa-user-circle"></i>
+                                            <span>{{ v.instructor }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12 text-center"><p>No learning videos available yet.</p></div>
+                        {% endif %}
+                    </div>
+                    <!-- Centered Browse All Videos Row -->
+                    <div class="row">
+                        <div class="col-12 video-more-wrap text-center">
+                            <a href="{{ url_for('public.learning_videos') }}" class="button-default button-large">
+                                Browse All Videos <i class="zmdi zmdi-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Video Learning Area -->
+
+            {% include 'includes/footer.html' %}
+        </div>
+        <!--End of Bg White-->
+    </div>
+    <!--End of Main Wrapper Area-->
+
+
+
+    <!-- jquery
+		============================================ -->
+    <script src="{{ url_for('static', filename='js/vendor/modernizr-3.6.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vendor/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vendor/jquery-migrate-3.3.2.min.js') }}"></script>
+
+    <!-- popper JS
+		============================================ -->
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+
+    <!-- bootstrap JS
+		============================================ -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    <!-- AJax Mail JS
+		============================================ -->
+    <script src="{{ url_for('static', filename='js/ajax-mail.js') }}"></script>
+
+    <!-- plugins JS
+		============================================ -->
+    <script src="{{ url_for('static', filename='js/plugins.js') }}"></script>
+
+    <!-- main JS
+		============================================ -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Mobile top bar: hamburger sidebar + search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var hamburger = document.getElementById('mobileHamburger');
+            var sidebar = document.getElementById('mobileSidebar');
+            var overlay = document.getElementById('mobileSidebarOverlay');
+            var closeBtn = document.getElementById('mobileSidebarClose');
+
+            function openSidebar() {
+                if (sidebar) sidebar.classList.add('open');
+                if (overlay) overlay.classList.add('open');
+                if (hamburger) hamburger.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeSidebar() {
+                if (sidebar) sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('open');
+                if (hamburger) hamburger.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            if (hamburger) {
+                hamburger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (sidebar && sidebar.classList.contains('open')) {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
+                    }
+                });
+            }
+            if (closeBtn) closeBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                closeSidebar();
+            });
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            // Close when a menu link is tapped
+            if (sidebar) {
+                sidebar.querySelectorAll('a').forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        // allow navigation, just close panel
+                        closeSidebar();
+                    });
+                });
+            }
+
+            // Search bar always visible on mobile – no toggle needed
+        });
+    </script>
+
+    <!-- Scroll reveal for sections – smooth content showing (home3-style transitions) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var sections = document.querySelectorAll('.reveal-on-scroll');
+            if (!sections.length) return;
+
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            io.unobserve(entry.target);
+                        }
+                    });
+                }, { root: null, rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+
+                sections.forEach(function (el) { io.observe(el); });
+            } else {
+                // Fallback: show all
+                sections.forEach(function (el) { el.classList.add('revealed'); });
+            }
+        });
+    </script>
+    <script>
+        jQuery(function ($) {
+            $('.testimonial-card-slider').owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: false,
+                dots: true,
+                autoplay: true,
+                autoplayTimeout: 4500,
+                responsive: {
+                    0: { items: 1 },
+                    768: { items: 2 },
+                    992: { items: 3 }
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tabs = document.querySelectorAll('.happen-tab');
+            var panels = document.querySelectorAll('.happen-panel');
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(function (t) { t.classList.remove('active'); });
+                    panels.forEach(function (p) { p.classList.remove('active'); });
+                    tab.classList.add('active');
+                    var panel = document.getElementById('panel-' + tab.getAttribute('data-tab'));
+                    if (panel) panel.classList.add('active');
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tabs = document.querySelectorAll('.happen-tab');
+            var panels = document.querySelectorAll('.happen-panel');
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(function (t) { t.classList.remove('active'); });
+                    panels.forEach(function (p) { p.classList.remove('active'); });
+                    tab.classList.add('active');
+                    var panel = document.getElementById('panel-' + tab.getAttribute('data-tab'));
+                    if (panel) panel.classList.add('active');
+                });
+            });
+        });
+    </script>
+    <!-- Lightbox Overlay for Home Video Playback -->
+    <div class="video-lightbox-overlay" id="homeVideoLightboxModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="video-lightbox-dialog" id="homeVideoLightboxDialog">
+            <div class="video-lightbox-head">
+                <div class="video-lightbox-title-wrap">
+                    <span class="video-lightbox-cat" id="homeModalVideoCat">Video</span>
+                    <h3 class="video-lightbox-title" id="homeModalVideoTitle">Watch Video</h3>
+                </div>
+                <button type="button" class="video-lightbox-close" id="homeModalVideoClose" aria-label="Close video">&times;</button>
+            </div>
+            
+            <div class="video-lightbox-body">
+                <div class="video-responsive-wrap">
+                    <iframe id="homeModalVideoIframe" src="" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="video-lightbox-foot" id="homeModalVideoFoot">
+                <div class="video-lightbox-instructor" id="homeModalVideoInstructor">
+                    <i class="fa fa-graduation-cap"></i> <span id="homeModalVideoInstructorText"></span>
+                </div>
+                <p class="video-lightbox-desc" id="homeModalVideoDesc"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var modal = document.getElementById('homeVideoLightboxModal');
+            var iframe = document.getElementById('homeModalVideoIframe');
+            var closeBtn = document.getElementById('homeModalVideoClose');
+            var titleEl = document.getElementById('homeModalVideoTitle');
+            var catEl = document.getElementById('homeModalVideoCat');
+            var instWrap = document.getElementById('homeModalVideoInstructor');
+            var instText = document.getElementById('homeModalVideoInstructorText');
+            var descEl = document.getElementById('homeModalVideoDesc');
+
+            function openVideo(data) {
+                if (!data.videoId) return;
+                iframe.src = 'https://www.youtube.com/embed/' + data.videoId + '?autoplay=1&rel=0&modestbranding=1&enablejsapi=1';
+                titleEl.textContent = data.title || 'Learning Video';
+                catEl.textContent = data.category || 'Lecture';
+                if (data.instructor && data.instructor.trim()) {
+                    instText.textContent = data.instructor;
+                    instWrap.style.display = 'flex';
+                } else {
+                    instWrap.style.display = 'none';
+                }
+                if (data.description && data.description.trim()) {
+                    descEl.textContent = data.description;
+                    descEl.style.display = 'block';
+                } else {
+                    descEl.style.display = 'none';
+                }
+                modal.classList.add('active');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeVideo() {
+                modal.classList.remove('active');
+                modal.setAttribute('aria-hidden', 'true');
+                iframe.src = '';
+                document.body.style.overflow = '';
+            }
+
+            document.addEventListener('click', function (e) {
+                var trigger = e.target.closest('.open-home-video-trigger');
+                if (trigger) {
+                    e.preventDefault();
+                    var card = trigger.closest('.learning-video-card');
+                    if (card) {
+                        openVideo({
+                            videoId: card.getAttribute('data-video-id'),
+                            title: card.getAttribute('data-title'),
+                            category: card.getAttribute('data-category'),
+                            instructor: card.getAttribute('data-instructor'),
+                            duration: card.getAttribute('data-duration'),
+                            description: card.getAttribute('data-description')
+                        });
+                    }
+                }
+            });
+
+            if (closeBtn) closeBtn.addEventListener('click', closeVideo);
+            if (modal) {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) closeVideo();
+                });
+            }
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                    closeVideo();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

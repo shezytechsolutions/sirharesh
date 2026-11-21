@@ -1,0 +1,514 @@
+{% extends 'admin/base.html' %}
+{% block title %}Learning Videos - Admin{% endblock %}
+{% block page_title %}Learning videos{% endblock %}
+
+{% block content %}
+<!-- Create Video Card -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-video"></i></span>
+      <h2>Add Learning Video</h2>
+    </div>
+  </div>
+  <div class="panel-body">
+    <form method="post" enctype="multipart/form-data" id="createVideoForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add">
+
+      <div class="form-grid">
+        <div class="full">
+          <label class="form-label" for="videoTitle">Video title</label>
+          <input type="text" name="title" id="videoTitle" placeholder="e.g. Introduction to Python Programming &amp; Logic Building" required autocomplete="off">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="videoUrl"><i class="fa-brands fa-youtube" style="color:#ef4444;margin-right:4px;"></i> YouTube video URL or ID</label>
+          <input type="text" name="youtube_url" id="videoUrl" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/... or 11-char ID" required>
+          <div class="hint">Supports any YouTube link (watch, share, shorts, or video ID). Video embeds automatically.</div>
+        </div>
+
+        <div>
+          <label class="form-label" for="videoCategory">Category</label>
+          <input type="text" name="category" id="videoCategory" list="cat-suggestions" placeholder="e.g. Programming, Mathematics, Science" value="Programming">
+          <datalist id="cat-suggestions">
+            <option value="Computer Science">
+            <option value="Programming">
+            <option value="Web Development">
+            <option value="Mathematics">
+            <option value="Science">
+            <option value="Communication">
+            <option value="Design">
+            <option value="Databases">
+            <option value="General">
+          </datalist>
+        </div>
+
+        <div>
+          <label class="form-label" for="videoInstructor">Instructor / Speaker</label>
+          <input type="text" name="instructor" id="videoInstructor" placeholder="e.g. Prof. David J. Malan">
+        </div>
+
+        <div>
+          <label class="form-label" for="videoDuration">Duration</label>
+          <input type="text" name="duration" id="videoDuration" placeholder="e.g. 24:15 or 45 mins">
+        </div>
+
+        <div>
+          <label class="form-label" for="videoOrder">Display order</label>
+          <input type="number" name="order" id="videoOrder" value="0" min="0">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="videoDesc">Description / Key highlights</label>
+          <textarea name="description" id="videoDesc" rows="3" placeholder="Overview of topics discussed, prerequisites, key learning outcomes..."></textarea>
+        </div>
+
+        <!-- Custom Thumbnail Dropzone -->
+        <div class="full">
+          <label class="form-label">Custom thumbnail (Optional)</label>
+          <div class="upload-dropzone" id="createVideoDropzone">
+            <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+            <div class="dropzone-title">Upload custom thumbnail</div>
+            <div class="dropzone-hint">PNG, JPG or WEBP (Leave blank to use automatic YouTube thumbnail)</div>
+            <input type="file" name="thumbnail" id="createVideoInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+          </div>
+          <div class="dropzone-preview" id="createVideoPreview">
+            <img src="" alt="Thumbnail Preview" class="dropzone-preview-img" id="createVideoPreviewImg">
+            <div class="dropzone-preview-info">
+              <div class="dropzone-preview-name" id="createVideoPreviewName">thumbnail.jpg</div>
+              <div class="dropzone-preview-size" id="createVideoPreviewSize">—</div>
+            </div>
+            <button type="button" class="dropzone-preview-remove" id="createVideoPreviewRemove" title="Remove custom thumbnail">
+              <i class="fa fa-xmark"></i>
+            </button>
+          </div>
+          <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter thumbnail path / URL</summary>
+            <input type="text" name="thumbnail_path" id="createVideoPath" placeholder="/static/uploads/videos/thumb.jpg" style="margin-top: 6px;">
+          </details>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+        <label class="switch-label-wrap">
+          <input type="checkbox" name="show_on_home" class="switch-input" id="createVideoShowHome" checked>
+          <span class="switch-slider"></span>
+          <span class="switch-text">Show on homepage</span>
+        </label>
+
+        <button type="submit" class="btn btn-blue" style="padding: 10px 24px; font-weight: 700;">
+          <i class="fa fa-plus"></i> Publish Video
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- All Videos List Card -->
+<div class="panel">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-video"></i></span>
+      <h2>Learning Videos</h2>
+      <span class="news-count-pill">{{ items|length }} Videos</span>
+    </div>
+  </div>
+
+  <div class="video-list" id="videoList">
+    {% for item in items %}
+    <div class="video-item-row" id="video-row-{{ item.id }}">
+      <!-- Thumbnail -->
+      <a href="https://youtu.be/{{ item.resolved_video_id }}" target="_blank" title="Watch on YouTube" style="display: block; flex-shrink: 0;">
+        <img src="{{ item.thumbnail_url }}" alt="{{ item.title }}" class="video-thumb" onerror="this.src='https://img.youtube.com/vi/{{ item.resolved_video_id }}/mqdefault.jpg'">
+      </a>
+
+      <!-- Info Cell -->
+      <div class="video-info-cell">
+        <span class="video-title-text" title="{{ item.title }}">{{ item.title }}</span>
+        <div class="video-meta-text">
+          <span class="meta-pill-tag"><i class="fa fa-tag"></i> {{ item.category or 'General' }}</span>
+          {% if item.instructor %}
+          <span><i class="fa fa-chalkboard-user"></i> {{ item.instructor }}</span>
+          {% endif %}
+          {% if item.duration %}
+          <span><i class="fa fa-clock"></i> {{ item.duration }}</span>
+          {% endif %}
+          <a href="https://youtu.be/{{ item.resolved_video_id }}" target="_blank" style="color: #ef4444; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Open in YouTube">
+            <i class="fa-brands fa-youtube"></i> YouTube
+          </a>
+          {% if item.show_on_home %}
+          <span class="home-badge"><i class="fa fa-house"></i> Home</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- End of row: Status Pill + 3-dots Menu (strictly pinned at end) -->
+      <div class="video-end-group">
+        {% if item.is_active %}
+        <span class="status-pill status-visible" title="Visible on site">
+          <i class="fa fa-circle-check"></i> Visible
+        </span>
+        {% else %}
+        <span class="status-pill status-hidden" title="Hidden from site">
+          <i class="fa fa-eye-slash"></i> Hidden
+        </span>
+        {% endif %}
+
+        <div class="video-actions-cell">
+          <button type="button" class="btn-dots video-menu-trigger" data-target="video-dropdown-{{ item.id }}" title="Actions">
+            <i class="fa fa-ellipsis-vertical"></i>
+          </button>
+          <div class="news-menu-dropdown video-menu-dropdown" id="video-dropdown-{{ item.id }}">
+            <button type="button" class="news-menu-item edit-video-trigger"
+                    data-id="{{ item.id }}"
+                    data-title="{{ item.title|e }}"
+                    data-url="{{ item.youtube_url|e }}"
+                    data-category="{{ (item.category or '')|e }}"
+                    data-instructor="{{ (item.instructor or '')|e }}"
+                    data-duration="{{ (item.duration or '')|e }}"
+                    data-desc="{{ (item.description or '')|e }}"
+                    data-order="{{ item.order or 0 }}"
+                    data-home="{{ '1' if item.show_on_home else '0' }}"
+                    data-thumb="{{ item.custom_thumbnail or '' }}"
+                    data-thumburl="{{ item.thumbnail_url or '' }}">
+              <i class="fa fa-pen-to-square"></i> Edit
+            </button>
+
+            <form method="post" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item">
+                <i class="fa {{ 'fa-eye-slash' if item.is_active else 'fa-eye' }}"></i>
+                {{ 'Hide' if item.is_active else 'Show' }}
+              </button>
+            </form>
+
+            <form method="post" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this learning video?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item danger">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div style="padding: 36px 20px; text-align: center; color: var(--muted);">
+      <i class="fa fa-video" style="font-size: 32px; opacity: 0.35; margin-bottom: 10px; display: block;"></i>
+      No learning videos published yet. Use the form above to add your first video.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Edit Video Modal -->
+<div class="modal-overlay" id="editVideoModal" style="display: none;">
+  <div class="modal-content" style="max-width: 680px;">
+    <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="news-header-icon" style="width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-pen-to-square"></i></span>
+        <h3>Edit Learning Video</h3>
+      </div>
+      <button type="button" class="modal-close" id="closeEditVideoModal" aria-label="Close dialog">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form method="post" enctype="multipart/form-data" id="editVideoForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="id" id="editVideoId" value="">
+
+        <div class="form-grid">
+          <div class="full">
+            <label class="form-label" for="editVideoTitle">Video title</label>
+            <input type="text" name="title" id="editVideoTitle" required autocomplete="off">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editVideoUrl"><i class="fa-brands fa-youtube" style="color:#ef4444;margin-right:4px;"></i> YouTube video URL or ID</label>
+            <input type="text" name="youtube_url" id="editVideoUrl" required>
+          </div>
+
+          <div>
+            <label class="form-label" for="editVideoCategory">Category</label>
+            <input type="text" name="category" id="editVideoCategory" list="cat-suggestions">
+          </div>
+
+          <div>
+            <label class="form-label" for="editVideoInstructor">Instructor / Speaker</label>
+            <input type="text" name="instructor" id="editVideoInstructor">
+          </div>
+
+          <div>
+            <label class="form-label" for="editVideoDuration">Duration</label>
+            <input type="text" name="duration" id="editVideoDuration">
+          </div>
+
+          <div>
+            <label class="form-label" for="editVideoOrder">Display order</label>
+            <input type="number" name="order" id="editVideoOrder" value="0" min="0">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editVideoDesc">Description / Key highlights</label>
+            <textarea name="description" id="editVideoDesc" rows="3"></textarea>
+          </div>
+
+          <!-- Thumbnail in Modal -->
+          <div class="full">
+            <label class="form-label">Custom thumbnail</label>
+            <div id="editCurrentVideoThumbWrap" style="display: none; align-items: center; gap: 12px; margin-bottom: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;">
+              <img src="" alt="Current Thumbnail" id="editCurrentVideoThumbImg" style="width: 58px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12.5px; font-weight: 600; color: var(--text);">Active thumbnail</div>
+                <div style="font-size: 11.5px; color: var(--muted); word-break: break-all;" id="editCurrentVideoThumbPath"></div>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="editVideoDropzone">
+              <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+              <div class="dropzone-title">Upload a new custom thumbnail</div>
+              <div class="dropzone-hint">PNG, JPG or WEBP (leave blank to keep current)</div>
+              <input type="file" name="thumbnail" id="editVideoThumbInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+            </div>
+
+            <div class="dropzone-preview" id="editVideoThumbPreview">
+              <img src="" alt="Preview" class="dropzone-preview-img" id="editVideoThumbPreviewImg">
+              <div class="dropzone-preview-info">
+                <div class="dropzone-preview-name" id="editVideoThumbPreviewName">thumbnail.jpg</div>
+                <div class="dropzone-preview-size" id="editVideoThumbPreviewSize">—</div>
+              </div>
+              <button type="button" class="dropzone-preview-remove" id="editVideoThumbPreviewRemove" title="Remove selected thumbnail">
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+
+            <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter thumbnail path / URL</summary>
+              <input type="text" name="thumbnail_path" id="editVideoThumbPathInput" placeholder="/static/uploads/videos/thumb.jpg" style="margin-top: 6px;">
+            </details>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+          <label class="switch-label-wrap">
+            <input type="checkbox" name="show_on_home" class="switch-input" id="editVideoShowHome">
+            <span class="switch-slider"></span>
+            <span class="switch-text">Show on homepage</span>
+          </label>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" id="cancelEditVideoBtn">Cancel</button>
+            <button type="submit" class="btn btn-blue" style="padding: 10px 22px; font-weight: 700;">
+              <i class="fa fa-check"></i> Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function setupDropzone(dropzoneId, inputId, previewId, previewImgId, previewNameId, previewSizeId, removeBtnId) {
+    var dropzone = document.getElementById(dropzoneId);
+    var input = document.getElementById(inputId);
+    var preview = document.getElementById(previewId);
+    var previewImg = document.getElementById(previewImgId);
+    var previewName = document.getElementById(previewNameId);
+    var previewSize = document.getElementById(previewSizeId);
+    var removeBtn = document.getElementById(removeBtnId);
+
+    if (!dropzone || !input) return;
+
+    ['dragenter', 'dragover'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', function(e){
+      var dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) {
+        input.files = dt.files;
+        handleFiles(input.files);
+      }
+    });
+
+    input.addEventListener('change', function(){
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      if (!files || !files.length) return;
+      var file = files[0];
+      if (previewName) previewName.textContent = file.name;
+      if (previewSize) previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+      var reader = new FileReader();
+      reader.onload = function(e){
+        if (previewImg) previewImg.src = e.target.result;
+        if (preview) preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        if (preview) preview.classList.remove('show');
+        if (previewImg) previewImg.src = '';
+      });
+    }
+  }
+
+  setupDropzone('createVideoDropzone', 'createVideoInput', 'createVideoPreview', 'createVideoPreviewImg', 'createVideoPreviewName', 'createVideoPreviewSize', 'createVideoPreviewRemove');
+  setupDropzone('editVideoDropzone', 'editVideoThumbInput', 'editVideoThumbPreview', 'editVideoThumbPreviewImg', 'editVideoThumbPreviewName', 'editVideoThumbPreviewSize', 'editVideoThumbPreviewRemove');
+
+  // Three-Dots Menu Toggle
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('.video-menu-trigger');
+    var isInsideDropdown = e.target.closest('.video-menu-dropdown');
+
+    if (trigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      var targetId = trigger.getAttribute('data-target');
+      var dropdown = document.getElementById(targetId);
+
+      document.querySelectorAll('.video-menu-dropdown.show').forEach(function(d){
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        if (b !== trigger) b.classList.remove('active');
+      });
+
+      if (dropdown) {
+        var rect = trigger.getBoundingClientRect();
+        var spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 180 && rect.top > 180) {
+          dropdown.classList.add('dropup');
+        } else {
+          dropdown.classList.remove('dropup');
+        }
+        dropdown.classList.toggle('show');
+        trigger.classList.toggle('active');
+      }
+      return;
+    }
+
+    if (!isInsideDropdown) {
+      document.querySelectorAll('.video-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        b.classList.remove('active');
+      });
+    }
+  });
+
+  // Edit Modal Functionality
+  var editModal = document.getElementById('editVideoModal');
+  var closeBtn = document.getElementById('closeEditVideoModal');
+  var cancelBtn = document.getElementById('cancelEditVideoBtn');
+
+  function openEditModal(data) {
+    document.getElementById('editVideoId').value = data.id || '';
+    document.getElementById('editVideoTitle').value = data.title || '';
+    document.getElementById('editVideoUrl').value = data.url || '';
+    document.getElementById('editVideoCategory').value = data.category || '';
+    document.getElementById('editVideoInstructor').value = data.instructor || '';
+    document.getElementById('editVideoDuration').value = data.duration || '';
+    document.getElementById('editVideoDesc').value = data.desc || '';
+    document.getElementById('editVideoOrder').value = data.order || 0;
+    document.getElementById('editVideoShowHome').checked = (data.home === '1' || data.home === true);
+
+    var fileInput = document.getElementById('editVideoThumbInput');
+    if (fileInput) fileInput.value = '';
+    var preview = document.getElementById('editVideoThumbPreview');
+    if (preview) preview.classList.remove('show');
+
+    // Thumbnail preview
+    var thumbWrap = document.getElementById('editCurrentVideoThumbWrap');
+    var thumbImg = document.getElementById('editCurrentVideoThumbImg');
+    var thumbPath = document.getElementById('editCurrentVideoThumbPath');
+    var thumbPathInput = document.getElementById('editVideoThumbPathInput');
+
+    var displayImg = data.thumb || data.thumburl || '';
+    if (displayImg) {
+      thumbImg.src = displayImg;
+      thumbPath.textContent = data.thumb ? data.thumb : 'YouTube default thumbnail';
+      thumbWrap.style.display = 'flex';
+      thumbPathInput.value = data.thumb || '';
+    } else {
+      thumbWrap.style.display = 'none';
+      thumbPathInput.value = '';
+    }
+
+    editModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEditModal() {
+    editModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', function(e){
+    var editBtn = e.target.closest('.edit-video-trigger');
+    if (editBtn) {
+      e.preventDefault();
+      document.querySelectorAll('.video-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      var data = {
+        id: editBtn.getAttribute('data-id'),
+        title: editBtn.getAttribute('data-title'),
+        url: editBtn.getAttribute('data-url'),
+        category: editBtn.getAttribute('data-category'),
+        instructor: editBtn.getAttribute('data-instructor'),
+        duration: editBtn.getAttribute('data-duration'),
+        desc: editBtn.getAttribute('data-desc'),
+        order: editBtn.getAttribute('data-order'),
+        home: editBtn.getAttribute('data-home'),
+        thumb: editBtn.getAttribute('data-thumb'),
+        thumburl: editBtn.getAttribute('data-thumburl')
+      };
+      openEditModal(data);
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
+
+  if (editModal) {
+    editModal.addEventListener('click', function(e){
+      if (e.target === editModal) closeEditModal();
+    });
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && editModal && editModal.style.display === 'flex') {
+      closeEditModal();
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'admin/base.html' %}
+{% block title %}Fun Factors{% endblock %}
+{% block page_title %}Fun factors{% endblock %}
+
+{% block content %}
+<div class="panel">
+  <div class="panel-head">
+    <h2><i class="fa fa-hashtag" style="color:var(--accent);margin-right:6px;"></i> Add Fun Factor / Counter</h2>
+  </div>
+  <div class="panel-body">
+    <form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add">
+      <div class="form-grid">
+        <div>
+          <label>Counter Number <span style="color:var(--danger)">*</span></label>
+          <input type="text" name="number" required placeholder="e.g. 2500+ or 98%">
+        </div>
+        <div>
+          <label>Counter Label <span style="color:var(--danger)">*</span></label>
+          <input type="text" name="label" required placeholder="e.g. Enrolled Students or Certified Alumni">
+        </div>
+        <div>
+          <label>Display Order</label>
+          <input type="number" name="order" value="0">
+        </div>
+        <div class="full">
+          <button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> Add Fun Factor</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>All Fun Factors ({{ items|length }})</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Label</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for item in items %}
+        <tr>
+          <td><strong style="font-size:16px;color:var(--navy);">{{ item.number }}</strong></td>
+          <td>{{ item.label }}</td>
+          <td>{{ item.order }}</td>
+          <td>
+            <div class="actions">
+              <form method="post" onsubmit="return confirm('Delete this fun factor?');" style="display:inline;">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="id" value="{{ item.id }}">
+                <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4">No fun factors added yet. Add one above.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

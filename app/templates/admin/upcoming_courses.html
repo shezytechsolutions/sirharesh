@@ -1,0 +1,535 @@
+{% extends 'admin/base.html' %}
+{% block title %}Upcoming Courses - Admin{% endblock %}
+{% block page_title %}Upcoming courses{% endblock %}
+
+{% block content %}
+<!-- Create Upcoming Course Card -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-calendar-plus"></i></span>
+      <h2>Create Upcoming Course</h2>
+    </div>
+  </div>
+  <div class="panel-body">
+    <form method="post" enctype="multipart/form-data" id="createUpcomingForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add">
+
+      <div class="form-grid">
+        <div class="full">
+          <label class="form-label" for="upcomingTitle">Course title</label>
+          <input type="text" name="title" id="upcomingTitle" placeholder="e.g. Full Stack Web Development Bootcamp" required autocomplete="off">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="upcomingDesc">Description &amp; Highlights</label>
+          <textarea name="description" id="upcomingDesc" rows="3" placeholder="Eligibility, syllabus highlights, prerequisites, certification details..."></textarea>
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingBatch">Batch name / Tag</label>
+          <input type="text" name="batch_name" id="upcomingBatch" placeholder="e.g. Batch 2026 - Weekend Track">
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingInstructor">Lead instructor</label>
+          <input type="text" name="instructor" id="upcomingInstructor" placeholder="e.g. Engr. Farhan Ali / CS Dept">
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingStartDate">Classes start date</label>
+          <input type="text" name="start_date" id="upcomingStartDate" placeholder="e.g. 15 Jul 2026">
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingLastDate">Last date to apply</label>
+          <input type="text" name="last_apply_date" id="upcomingLastDate" placeholder="e.g. 10 Jul 2026">
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingDuration">Course duration</label>
+          <input type="text" name="duration" id="upcomingDuration" placeholder="e.g. 3 Months (Weekend)">
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingFee">Course fee</label>
+          <input type="text" name="fee" id="upcomingFee" placeholder="e.g. Rs. 15,000 / Free Workshop">
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingSeats">Total available seats</label>
+          <input type="text" name="seats" id="upcomingSeats" placeholder="e.g. 35 Seats Only">
+        </div>
+
+        <div>
+          <label class="form-label" for="upcomingOrder">Display order</label>
+          <input type="number" name="order" id="upcomingOrder" value="0" min="0">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="upcomingFormLink"><i class="fa fa-wpforms" style="color:var(--secondary)"></i> Google Form / Registration link</label>
+          <input type="url" name="form_link" id="upcomingFormLink" placeholder="https://forms.gle/... or external registration link">
+          <div class="hint">When set, students clicking "Apply Now" will be directed directly to this form.</div>
+        </div>
+
+        <!-- Poster Image Drag & Drop -->
+        <div class="full">
+          <label class="form-label">Cover poster image</label>
+          <div class="upload-dropzone" id="createUpcomingDropzone">
+            <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+            <div class="dropzone-title">Upload cover poster</div>
+            <div class="dropzone-hint">PNG, JPG or WEBP (Recommended: 800 × 500 px)</div>
+            <input type="file" name="image" id="createUpcomingInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+          </div>
+          <div class="dropzone-preview" id="createUpcomingPreview">
+            <img src="" alt="Preview" class="dropzone-preview-img" id="createUpcomingPreviewImg">
+            <div class="dropzone-preview-info">
+              <div class="dropzone-preview-name" id="createUpcomingPreviewName">poster.jpg</div>
+              <div class="dropzone-preview-size" id="createUpcomingPreviewSize">—</div>
+            </div>
+            <button type="button" class="dropzone-preview-remove" id="createUpcomingPreviewRemove" title="Remove image">
+              <i class="fa fa-xmark"></i>
+            </button>
+          </div>
+          <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter image path / URL</summary>
+            <input type="text" name="image_path" id="createUpcomingPath" placeholder="/static/img/course/1.jpg" style="margin-top: 6px;">
+          </details>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+        <button type="submit" class="btn btn-blue" style="padding: 10px 24px; font-weight: 700;">
+          <i class="fa fa-plus"></i> Publish Upcoming Course
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- All Upcoming Batches List Card -->
+<div class="panel">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-calendar-plus"></i></span>
+      <h2>Upcoming Courses</h2>
+      <span class="news-count-pill">{{ items|length }} Batches</span>
+    </div>
+  </div>
+
+  <div class="upcoming-list" id="upcomingList">
+    {% for item in items %}
+    <div class="upcoming-item-row" id="upcoming-row-{{ item.id }}">
+      <!-- Thumbnail -->
+      {% if item.image %}
+      <img src="{{ item.image }}" alt="{{ item.title }}" class="upcoming-thumb" onerror="this.onerror=null;this.src='/static/img/course/1.jpg';">
+      {% else %}
+      <div class="upcoming-thumb-placeholder"><i class="fa fa-calendar-plus"></i></div>
+      {% endif %}
+
+      <!-- Info Cell -->
+      <div class="upcoming-info-cell">
+        <span class="upcoming-title-text" title="{{ item.title }}">{{ item.title }}</span>
+        <div class="upcoming-meta-text">
+          {% if item.batch_name %}
+          <span class="meta-pill-tag"><i class="fa fa-tag"></i> {{ item.batch_name }}</span>
+          {% endif %}
+          <span><i class="fa fa-calendar"></i> Starts: {{ item.start_date or 'TBA' }}</span>
+          <span><i class="fa fa-clock"></i> Apply by: {{ item.last_apply_date or 'Open' }}</span>
+          {% if item.form_link %}
+          <a href="{{ item.form_link|safe_url }}" target="_blank" class="meta-pdf-pill" title="Registration Form Link">
+            <i class="fa fa-wpforms"></i> Form Link
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- End of row: Status Pill + 3-dots Menu (strictly pinned at end) -->
+      <div class="upcoming-end-group">
+        {% if item.is_active %}
+        <span class="status-pill status-visible" title="Visible on site">
+          <i class="fa fa-circle-check"></i> Visible
+        </span>
+        {% else %}
+        <span class="status-pill status-hidden" title="Hidden from site">
+          <i class="fa fa-eye-slash"></i> Hidden
+        </span>
+        {% endif %}
+
+        <div class="upcoming-actions-cell">
+          <button type="button" class="btn-dots upcoming-menu-trigger" data-target="upcoming-dropdown-{{ item.id }}" title="Actions">
+            <i class="fa fa-ellipsis-vertical"></i>
+          </button>
+          <div class="news-menu-dropdown upcoming-menu-dropdown" id="upcoming-dropdown-{{ item.id }}">
+            <button type="button" class="news-menu-item edit-upcoming-trigger"
+                    data-id="{{ item.id }}"
+                    data-title="{{ item.title|e }}"
+                    data-desc="{{ (item.description or '')|e }}"
+                    data-batch="{{ (item.batch_name or '')|e }}"
+                    data-start="{{ (item.start_date or '')|e }}"
+                    data-last="{{ (item.last_apply_date or '')|e }}"
+                    data-duration="{{ (item.duration or '')|e }}"
+                    data-fee="{{ (item.fee or '')|e }}"
+                    data-seats="{{ (item.seats or '')|e }}"
+                    data-instructor="{{ (item.instructor or '')|e }}"
+                    data-form="{{ (item.form_link or '')|e }}"
+                    data-order="{{ item.order or 0 }}"
+                    data-image="{{ item.image or '' }}">
+              <i class="fa fa-pen-to-square"></i> Edit
+            </button>
+
+            <form method="post" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item">
+                <i class="fa {{ 'fa-eye-slash' if item.is_active else 'fa-eye' }}"></i>
+                {{ 'Hide' if item.is_active else 'Show' }}
+              </button>
+            </form>
+
+            <form method="post" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this upcoming course?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item danger">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div style="padding: 36px 20px; text-align: center; color: var(--muted);">
+      <i class="fa fa-calendar-plus" style="font-size: 32px; opacity: 0.35; margin-bottom: 10px; display: block;"></i>
+      No upcoming courses published yet. Use the form above to add your first batch.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Edit Upcoming Course Modal -->
+<div class="modal-overlay" id="editUpcomingModal" style="display: none;">
+  <div class="modal-content" style="max-width: 680px;">
+    <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="news-header-icon" style="width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-pen-to-square"></i></span>
+        <h3>Edit Upcoming Course</h3>
+      </div>
+      <button type="button" class="modal-close" id="closeEditUpcomingModal" aria-label="Close dialog">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form method="post" enctype="multipart/form-data" id="editUpcomingForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="id" id="editUpcomingId" value="">
+
+        <div class="form-grid">
+          <div class="full">
+            <label class="form-label" for="editUpcomingTitle">Course title</label>
+            <input type="text" name="title" id="editUpcomingTitle" required autocomplete="off">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editUpcomingDesc">Description &amp; Highlights</label>
+            <textarea name="description" id="editUpcomingDesc" rows="3"></textarea>
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingBatch">Batch name / Tag</label>
+            <input type="text" name="batch_name" id="editUpcomingBatch">
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingInstructor">Lead instructor</label>
+            <input type="text" name="instructor" id="editUpcomingInstructor">
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingStart">Classes start date</label>
+            <input type="text" name="start_date" id="editUpcomingStart">
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingLast">Last date to apply</label>
+            <input type="text" name="last_apply_date" id="editUpcomingLast">
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingDuration">Course duration</label>
+            <input type="text" name="duration" id="editUpcomingDuration">
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingFee">Course fee</label>
+            <input type="text" name="fee" id="editUpcomingFee">
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingSeats">Total available seats</label>
+            <input type="text" name="seats" id="editUpcomingSeats">
+          </div>
+
+          <div>
+            <label class="form-label" for="editUpcomingOrder">Display order</label>
+            <input type="number" name="order" id="editUpcomingOrder" value="0" min="0">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editUpcomingFormLink">Registration / Form link</label>
+            <input type="url" name="form_link" id="editUpcomingFormLink">
+          </div>
+
+          <!-- Cover Image in Modal -->
+          <div class="full">
+            <label class="form-label">Cover poster image</label>
+            <div id="editCurrentUpcomingPosterWrap" style="display: none; align-items: center; gap: 12px; margin-bottom: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;">
+              <img src="" alt="Current Poster" id="editCurrentUpcomingPosterImg" style="width: 58px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12.5px; font-weight: 600; color: var(--text);">Current poster</div>
+                <div style="font-size: 11.5px; color: var(--muted); word-break: break-all;" id="editCurrentUpcomingPosterPath"></div>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="editUpcomingDropzone">
+              <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+              <div class="dropzone-title">Upload a new cover poster</div>
+              <div class="dropzone-hint">PNG, JPG or WEBP (leave blank to keep current)</div>
+              <input type="file" name="image" id="editUpcomingPosterInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+            </div>
+
+            <div class="dropzone-preview" id="editUpcomingPosterPreview">
+              <img src="" alt="Preview" class="dropzone-preview-img" id="editUpcomingPosterPreviewImg">
+              <div class="dropzone-preview-info">
+                <div class="dropzone-preview-name" id="editUpcomingPosterPreviewName">poster.jpg</div>
+                <div class="dropzone-preview-size" id="editUpcomingPosterPreviewSize">—</div>
+              </div>
+              <button type="button" class="dropzone-preview-remove" id="editUpcomingPosterPreviewRemove" title="Remove selected image">
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+
+            <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter image path / URL</summary>
+              <input type="text" name="image_path" id="editUpcomingPosterPathInput" placeholder="/static/img/course/1.jpg" style="margin-top: 6px;">
+            </details>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); gap: 10px;">
+          <button type="button" class="btn btn-secondary" id="cancelEditUpcomingBtn">Cancel</button>
+          <button type="submit" class="btn btn-blue" style="padding: 10px 22px; font-weight: 700;">
+            <i class="fa fa-check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // --- Helper for Drag & Drop + File Preview ---
+  function setupDropzone(dropzoneId, inputId, previewId, previewImgId, previewNameId, previewSizeId, removeBtnId) {
+    var dropzone = document.getElementById(dropzoneId);
+    var input = document.getElementById(inputId);
+    var preview = document.getElementById(previewId);
+    var previewImg = document.getElementById(previewImgId);
+    var previewName = document.getElementById(previewNameId);
+    var previewSize = document.getElementById(previewSizeId);
+    var removeBtn = document.getElementById(removeBtnId);
+
+    if (!dropzone || !input) return;
+
+    ['dragenter', 'dragover'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', function(e){
+      var dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) {
+        input.files = dt.files;
+        handleFiles(input.files);
+      }
+    });
+
+    input.addEventListener('change', function(){
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      if (!files || !files.length) return;
+      var file = files[0];
+      if (previewName) previewName.textContent = file.name;
+      if (previewSize) previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+      var reader = new FileReader();
+      reader.onload = function(e){
+        if (previewImg) previewImg.src = e.target.result;
+        if (preview) preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        if (preview) preview.classList.remove('show');
+        if (previewImg) previewImg.src = '';
+      });
+    }
+  }
+
+  setupDropzone('createUpcomingDropzone', 'createUpcomingInput', 'createUpcomingPreview', 'createUpcomingPreviewImg', 'createUpcomingPreviewName', 'createUpcomingPreviewSize', 'createUpcomingPreviewRemove');
+  setupDropzone('editUpcomingDropzone', 'editUpcomingPosterInput', 'editUpcomingPosterPreview', 'editUpcomingPosterPreviewImg', 'editUpcomingPosterPreviewName', 'editUpcomingPosterPreviewSize', 'editUpcomingPosterPreviewRemove');
+
+  // --- Three-Dots Dropdown Menu Toggle ---
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('.upcoming-menu-trigger');
+    var isInsideDropdown = e.target.closest('.upcoming-menu-dropdown');
+
+    if (trigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      var targetId = trigger.getAttribute('data-target');
+      var dropdown = document.getElementById(targetId);
+
+      document.querySelectorAll('.upcoming-menu-dropdown.show').forEach(function(d){
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        if (b !== trigger) b.classList.remove('active');
+      });
+
+      if (dropdown) {
+        var rect = trigger.getBoundingClientRect();
+        var spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 180 && rect.top > 180) {
+          dropdown.classList.add('dropup');
+        } else {
+          dropdown.classList.remove('dropup');
+        }
+        dropdown.classList.toggle('show');
+        trigger.classList.toggle('active');
+      }
+      return;
+    }
+
+    if (!isInsideDropdown) {
+      document.querySelectorAll('.upcoming-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        b.classList.remove('active');
+      });
+    }
+  });
+
+  // --- Edit Upcoming Modal Functionality ---
+  var editModal = document.getElementById('editUpcomingModal');
+  var closeBtn = document.getElementById('closeEditUpcomingModal');
+  var cancelBtn = document.getElementById('cancelEditUpcomingBtn');
+
+  function openEditModal(data) {
+    document.getElementById('editUpcomingId').value = data.id || '';
+    document.getElementById('editUpcomingTitle').value = data.title || '';
+    document.getElementById('editUpcomingDesc').value = data.desc || '';
+    document.getElementById('editUpcomingBatch').value = data.batch || '';
+    document.getElementById('editUpcomingStart').value = data.start || '';
+    document.getElementById('editUpcomingLast').value = data.last || '';
+    document.getElementById('editUpcomingDuration').value = data.duration || '';
+    document.getElementById('editUpcomingFee').value = data.fee || '';
+    document.getElementById('editUpcomingSeats').value = data.seats || '';
+    document.getElementById('editUpcomingInstructor').value = data.instructor || '';
+    document.getElementById('editUpcomingFormLink').value = data.form || '';
+    document.getElementById('editUpcomingOrder').value = data.order || 0;
+
+    // Reset file input & preview
+    var fileInput = document.getElementById('editUpcomingPosterInput');
+    if (fileInput) fileInput.value = '';
+    var preview = document.getElementById('editUpcomingPosterPreview');
+    if (preview) preview.classList.remove('show');
+
+    // Poster preview
+    var posterWrap = document.getElementById('editCurrentUpcomingPosterWrap');
+    var posterImg = document.getElementById('editCurrentUpcomingPosterImg');
+    var posterPath = document.getElementById('editCurrentUpcomingPosterPath');
+    var posterPathInput = document.getElementById('editUpcomingPosterPathInput');
+    if (data.image) {
+      posterImg.src = data.image;
+      posterPath.textContent = data.image;
+      posterWrap.style.display = 'flex';
+      posterPathInput.value = data.image;
+    } else {
+      posterWrap.style.display = 'none';
+      posterPathInput.value = '';
+    }
+
+    editModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEditModal() {
+    editModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', function(e){
+    var editBtn = e.target.closest('.edit-upcoming-trigger');
+    if (editBtn) {
+      e.preventDefault();
+      document.querySelectorAll('.upcoming-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      var data = {
+        id: editBtn.getAttribute('data-id'),
+        title: editBtn.getAttribute('data-title'),
+        desc: editBtn.getAttribute('data-desc'),
+        batch: editBtn.getAttribute('data-batch'),
+        start: editBtn.getAttribute('data-start'),
+        last: editBtn.getAttribute('data-last'),
+        duration: editBtn.getAttribute('data-duration'),
+        fee: editBtn.getAttribute('data-fee'),
+        seats: editBtn.getAttribute('data-seats'),
+        instructor: editBtn.getAttribute('data-instructor'),
+        form: editBtn.getAttribute('data-form'),
+        order: editBtn.getAttribute('data-order'),
+        image: editBtn.getAttribute('data-image')
+      };
+      openEditModal(data);
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
+
+  if (editModal) {
+    editModal.addEventListener('click', function(e){
+      if (e.target === editModal) closeEditModal();
+    });
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && editModal && editModal.style.display === 'flex') {
+      closeEditModal();
+    }
+  });
+})();
+</script>
+{% endblock %}

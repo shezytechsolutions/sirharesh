@@ -1,0 +1,260 @@
+{% extends 'admin/base.html' %}
+{% block title %}Header Customization - AIMS Sukkur Admin{% endblock %}
+{% block page_title %}Header{% endblock %}
+
+{% block content %}
+<!-- Page Header Navigation & View Button -->
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+  <div>
+    <h2 style="font-size:20px;font-weight:700;color:var(--navy);margin:0;">Header Customization</h2>
+    <p style="font-size:13px;color:var(--muted);margin:4px 0 0;">Customize the top announcement bar, support contact details, and brand logo.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('public.index') }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+      <i class="fa fa-arrow-up-right-from-square"></i> View Live Site
+    </a>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('admin.admin_header') }}" enctype="multipart/form-data" id="headerCustomizerForm">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <!-- Real-time Visual Preview Card -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:14px 20px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-eye" style="color:var(--navy);font-size:15px;"></i>
+        <h2 style="font-size:15px;font-weight:700;color:var(--navy);margin:0;">Header Preview</h2>
+      </div>
+      <span style="font-size:11.5px;color:var(--muted);">Simulated live view</span>
+    </div>
+    <div class="panel-body" style="padding:18px;">
+      <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <!-- Top bar simulation -->
+        <div id="previewTopBar" style="background:#1E3A6D;color:#ffffff;padding:8px 16px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;transition:all 0.2s;">
+          <div id="previewQuestion">
+            <i class="fa fa-circle-question" style="opacity:0.85;margin-right:6px;"></i>
+            <span id="previewQuestionText">{{ settings.get('header_top_question') or ('Have any question? ' ~ (settings.get('phone') or '+92 300 0000000')) }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;font-size:12px;">
+            <span id="previewPhone">
+              <i class="fa fa-phone" style="opacity:0.85;margin-right:4px;"></i>
+              <span id="previewPhoneText">{{ settings.get('header_top_phone') or settings.get('phone') or '+92 300 0000000' }}</span>
+            </span>
+            <span id="previewEmail">
+              <i class="fa fa-envelope" style="opacity:0.85;margin-right:4px;"></i>
+              <span id="previewEmailText">{{ settings.get('header_top_email') or settings.get('email') or 'info@aimssukkur.edu.pk' }}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Main navigation simulation -->
+        <div style="background:#ffffff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,0,0,0.05);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <img id="headerSimLogo"
+                 src="{{ settings.get('header_logo') or url_for('static', filename='img/logo/logo.png') }}"
+                 alt="Header Logo"
+                 style="height:38px;max-width:140px;object-fit:contain;"
+                 onerror="this.src='/static/img/logo/logo.png'">
+            <span id="previewBrandName" style="font-size:13.5px;font-weight:700;color:var(--navy);display:none;">{{ settings.get('site_name') or 'AIMS Sukkur' }}</span>
+          </div>
+          <div style="display:flex;gap:14px;color:var(--text);font-size:12.5px;font-weight:600;opacity:0.75;">
+            <span>Home</span>
+            <span>About</span>
+            <span>Courses</span>
+            <span>E-Library</span>
+            <span>Events</span>
+            <span>Contact</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 1: Header Top Bar (div.header-top) -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-bars" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Header Top Bar (div.header-top)</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;display:flex;flex-direction:column;gap:18px;">
+      <!-- Toggle Visibility -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;">
+        <div>
+          <div style="font-size:13.5px;font-weight:700;color:var(--navy);">Show Header Top Bar</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Display the contact and inquiry strip above the main navbar.</div>
+        </div>
+        <label class="switch-toggle" style="position:relative;display:inline-block;width:44px;height:24px;margin:0;cursor:pointer;">
+          <input type="checkbox" name="header_top_enabled" id="headerTopToggle" value="1"
+                 {% if settings.get('header_top_enabled', '1') != '0' %}checked{% endif %}
+                 style="opacity:0;width:0;height:0;">
+          <span class="slider" style="position:absolute;inset:0;background:#cbd5e1;border-radius:24px;transition:0.2s;"></span>
+        </label>
+      </div>
+
+      <!-- Top Bar Content Fields -->
+      <div class="hero-text-grid">
+        <div class="form-group full">
+          <label for="headerTopQuestionInput">Question / Inquiry Notice Text</label>
+          <input type="text" id="headerTopQuestionInput" name="header_top_question"
+                 value="{{ settings.get('header_top_question', '') }}"
+                 placeholder="Have any question? +92 300 0000000"
+                 autocomplete="off">
+          <span style="font-size:11.5px;color:var(--muted);margin-top:4px;">Appears on the left side of the top header bar.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="headerTopPhoneInput">Support Phone</label>
+          <input type="text" id="headerTopPhoneInput" name="header_top_phone"
+                 value="{{ settings.get('header_top_phone', '') }}"
+                 placeholder="{{ settings.get('phone') or '+92 300 0000000' }}"
+                 autocomplete="off">
+          <span style="font-size:11.5px;color:var(--muted);margin-top:4px;">Leave blank to use primary institute phone.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="headerTopEmailInput">Support Email</label>
+          <input type="email" id="headerTopEmailInput" name="header_top_email"
+                 value="{{ settings.get('header_top_email', '') }}"
+                 placeholder="{{ settings.get('email') or 'info@aimssukkur.edu.pk' }}"
+                 autocomplete="off">
+          <span style="font-size:11.5px;color:var(--muted);margin-top:4px;">Leave blank to use primary institute email.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Header Logo & Brand -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-image" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Header Logo &amp; Brand</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <div class="hero-images-grid" style="grid-template-columns:1fr 1fr;">
+        <!-- Logo Image Column -->
+        <div class="hero-image-col">
+          <span class="hero-img-label">Header Logo</span>
+          <div class="hero-img-row">
+            <div class="hero-thumb-box" style="height:80px;background:#f8fafc;padding:6px;">
+              <img id="headerLogoPreview"
+                   src="{{ settings.get('header_logo') or url_for('static', filename='img/logo/logo.png') }}"
+                   alt="Header Logo"
+                   style="object-fit:contain;width:100%;height:100%;"
+                   onerror="this.src='/static/img/logo/logo.png'">
+            </div>
+            <div>
+              <label for="headerLogoInput" class="btn-change-pill">
+                <i class="fa fa-cloud-arrow-up"></i> Change Logo
+              </label>
+              <input type="file" id="headerLogoInput" name="header_logo" accept="image/png, image/jpeg, image/webp, image/svg+xml" style="display:none;" onchange="previewHeaderLogo(this)">
+              <input type="hidden" name="header_logo_path" id="headerLogoPath" value="{{ settings.get('header_logo', '') }}">
+              <div style="font-size:11.5px;color:var(--muted);margin-top:6px;">PNG, SVG, or WEBP (Transparent recommended)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brand Name Column -->
+        <div class="hero-image-col" style="justify-content:center;">
+          <div class="form-group" style="margin:0;">
+            <label for="siteNameInput" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Site / Institute Brand Name</label>
+            <input type="text" id="siteNameInput" name="site_name"
+                   value="{{ settings.get('site_name', 'AIMS Sukkur') }}"
+                   placeholder="AIMS Sukkur"
+                   style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;"
+                   autocomplete="off">
+            <span style="font-size:11.5px;color:var(--muted);margin-top:4px;">Used for logo alt text, title tags, and brand identity.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Action Panel -->
+  <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:16px 20px;background:#ffffff;border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+    <a href="{{ url_for('public.index') }}" target="_blank" rel="noopener" class="btn btn-outline">Cancel / View</a>
+    <button type="submit" class="btn btn-blue" style="min-width:180px;">
+      <i class="fa fa-check"></i> Save Header Details
+    </button>
+  </div>
+</form>
+
+<style>
+/* Switch Toggle Styles */
+.switch-toggle input:checked + .slider {
+  background-color: var(--secondary) !important;
+}
+.switch-toggle .slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.switch-toggle input:checked + .slider:before {
+  transform: translateX(20px);
+}
+</style>
+
+<script>
+function previewHeaderLogo(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      const preview = document.getElementById('headerLogoPreview');
+      const simLogo = document.getElementById('headerSimLogo');
+      if (preview) preview.src = dataUrl;
+      if (simLogo) simLogo.src = dataUrl;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// Live preview synchronization
+(function() {
+  const qInput = document.getElementById('headerTopQuestionInput');
+  const pInput = document.getElementById('headerTopPhoneInput');
+  const eInput = document.getElementById('headerTopEmailInput');
+  const topToggle = document.getElementById('headerTopToggle');
+  const previewBar = document.getElementById('previewTopBar');
+
+  const qText = document.getElementById('previewQuestionText');
+  const pText = document.getElementById('previewPhoneText');
+  const eText = document.getElementById('previewEmailText');
+
+  if (qInput && qText) {
+    qInput.addEventListener('input', () => {
+      qText.textContent = qInput.value.trim() || 'Have any question? +92 300 0000000';
+    });
+  }
+
+  if (pInput && pText) {
+    pInput.addEventListener('input', () => {
+      pText.textContent = pInput.value.trim() || '+92 300 0000000';
+    });
+  }
+
+  if (eInput && eText) {
+    eInput.addEventListener('input', () => {
+      eText.textContent = eInput.value.trim() || 'info@aimssukkur.edu.pk';
+    });
+  }
+
+  if (topToggle && previewBar) {
+    topToggle.addEventListener('change', () => {
+      previewBar.style.display = topToggle.checked ? 'flex' : 'none';
+    });
+  }
+})();
+</script>
+{% endblock %}

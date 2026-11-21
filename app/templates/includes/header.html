@@ -1,0 +1,113 @@
+<!-- Header Area Start -->
+<header>
+    {% if settings.get('header_top_enabled', '1') != '0' %}
+    <div class="header-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7 col-md-6 col-12">
+                    <span>{{ settings.get('header_top_question') or ('Have any question? ' ~ (settings.get('phone') or '+92 300 0000000')) }}</span>
+                </div>
+                <div class="col-lg-5 col-md-6 col-12">
+                    <div class="header-top-right">
+                        <span>Phone: {{ settings.get('header_top_phone') or settings.get('phone') or '+92 300 0000000' }}</span>
+                        <span>Email: {{ settings.get('header_top_email') or settings.get('email') or 'info@aimssukkur.edu.pk' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="header-logo-menu sticker">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-12">
+                    <div class="logo">
+                        <a href="{{ url_for('public.index') }}"><img
+                                src="{{ settings.get('header_logo') or url_for('static', filename='img/logo/logo.png') }}" alt="{{ settings.get('site_name') or 'AIMS Sukkur' }}" height="60px"
+                                width="200px"
+                                onerror="this.src='{{ url_for('static', filename='img/logo/logo.png') }}'"></a>
+                    </div>
+                </div>
+                <div class="col-lg-9 col-12">
+                    <div class="mainmenu-area pull-right">
+                        <div class="mainmenu d-none d-lg-block">
+                            <nav>
+                                <ul id="nav">
+                                    <li class="current"><a href="/">Home</a></li>
+                                    <li><a href="/about">About</a></li>
+                                    <li><a href="/courses">Courses</a></li>
+                                    <li><a href="/e-library">E-Library</a></li>
+                                    <li><a href="/videos">Videos</a></li>
+                                    <li><a href="/events">Events</a></li>
+                                    <li><a href="/contact">Contact</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                        <ul class="header-search">
+                            <li class="search-menu">
+                                <i id="toggle-search" class="zmdi zmdi-search"></i>
+                            </li>
+                        </ul>
+                        <div class="search">
+                            <div class="search-form">
+                                <form id="search-form" action="{{ url_for('public.courses') }}" method="get">
+                                    <input type="search" placeholder="Search here..." name="q" autocomplete="off" />
+                                    <button type="submit"><span><i class="fa fa-search"></i></span></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <!-- Mobile Menu Area -->
+    <div class="mobile-menu-area">
+        
+        <!-- White bar: logo + hamburger -->
+        <div class="mobile-topbar-inner">
+            <div class="mobile-logo">
+                <a href="/"><img src="{{ settings.get('header_logo') or url_for('static', filename='img/logo/logo.png') }}" alt="{{ settings.get('site_name') or 'AIMS Sukkur' }}" onerror="this.src='{{ url_for('static', filename='img/logo/logo.png') }}'"></a>
+            </div>
+            <div class="mobile-topbar-right">
+                <a href="#" class="mobile-hamburger" id="mobileHamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </a>
+            </div>
+        </div>
+        <!-- Mobile Search Bar -->
+        <div class="mobile-search-bar">
+            <form action="{{ url_for('public.courses') }}" method="get" class="mobile-search-form" onsubmit="var q = document.getElementById('mobileSearchInput').value.trim(); if (!q) return false;">
+                <div class="mobile-search-input-wrap">
+                    <i class="fa fa-search mobile-search-icon"></i>
+                    <input type="search" placeholder="Search Here..." id="mobileSearchInput" name="q" autocomplete="off">
+                </div>
+                <button type="submit" class="mobile-search-btn">
+                    <i class="fa fa-search"></i>
+                    <span>Search</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
+    <aside class="mobile-sidebar" id="mobileSidebar">
+        <div class="mobile-sidebar-header">
+            <span>Menu</span>
+            <a href="#" class="mobile-sidebar-close" id="mobileSidebarClose" aria-label="Close">&times;</a>
+        </div>
+        <nav class="mobile-sidebar-nav">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/courses">Courses</a></li>
+                <li><a href="/e-library">E-Library</a></li>
+                <li><a href="/videos">Videos</a></li>
+                <li><a href="/events">Events</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </aside>
+</header>
+<!-- End Header -->

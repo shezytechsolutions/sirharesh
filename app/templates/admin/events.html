@@ -1,0 +1,500 @@
+{% extends 'admin/base.html' %}
+{% block title %}Events - Admin{% endblock %}
+{% block page_title %}Events{% endblock %}
+
+{% block content %}
+<!-- Create Event Card -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-calendar-days"></i></span>
+      <h2>Create Event</h2>
+    </div>
+  </div>
+  <div class="panel-body">
+    <form method="post" enctype="multipart/form-data" id="createEventForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add">
+
+      <div class="form-grid">
+        <div class="full">
+          <label class="form-label" for="eventTitle">Event title</label>
+          <input type="text" name="title" id="eventTitle" placeholder="e.g. Annual Tech Symposium &amp; Science Fair 2026" required autocomplete="off">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="eventContent">Event description &amp; details</label>
+          <textarea name="content" id="eventContent" rows="4" placeholder="Event summary, schedule, keynote speakers, venue directions..." required></textarea>
+        </div>
+
+        <div>
+          <label class="form-label" for="eventDate">Event date</label>
+          <input type="text" name="date" id="eventDate" placeholder="e.g. 15 Jun 2026">
+        </div>
+
+        <div>
+          <label class="form-label" for="eventTime">Event time</label>
+          <input type="text" name="time" id="eventTime" placeholder="e.g. 10:00 AM - 3:00 PM">
+        </div>
+
+        <div>
+          <label class="form-label" for="eventLocation">Location / Venue</label>
+          <input type="text" name="location" id="eventLocation" placeholder="e.g. Main Auditorium, AIMS Sukkur">
+        </div>
+
+        <div>
+          <label class="form-label" for="eventOrder">Display order</label>
+          <input type="number" name="order" id="eventOrder" value="0" min="0">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="eventFormLink"><i class="fa fa-wpforms" style="color:var(--secondary)"></i> Registration / Form link (Google Form or URL)</label>
+          <input type="url" name="form_link" id="eventFormLink" placeholder="https://forms.gle/... or external registration link">
+          <div class="hint">When provided, attendees will be able to register directly through this link.</div>
+        </div>
+
+        <!-- Poster Image Drag & Drop -->
+        <div class="full">
+          <label class="form-label">Event poster image</label>
+          <div class="upload-dropzone" id="createEventDropzone">
+            <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+            <div class="dropzone-title">Upload event poster</div>
+            <div class="dropzone-hint">PNG, JPG or WEBP (Recommended: 800 × 500 px)</div>
+            <input type="file" name="image" id="createEventInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+          </div>
+          <div class="dropzone-preview" id="createEventPreview">
+            <img src="" alt="Preview" class="dropzone-preview-img" id="createEventPreviewImg">
+            <div class="dropzone-preview-info">
+              <div class="dropzone-preview-name" id="createEventPreviewName">poster.jpg</div>
+              <div class="dropzone-preview-size" id="createEventPreviewSize">—</div>
+            </div>
+            <button type="button" class="dropzone-preview-remove" id="createEventPreviewRemove" title="Remove image">
+              <i class="fa fa-xmark"></i>
+            </button>
+          </div>
+          <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter image path / URL</summary>
+            <input type="text" name="image_path" id="createEventPath" placeholder="/static/img/event/1.jpg" style="margin-top: 6px;">
+          </details>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+        <label class="switch-label-wrap">
+          <input type="checkbox" name="show_on_home" class="switch-input" id="createEventShowHome" checked>
+          <span class="switch-slider"></span>
+          <span class="switch-text">Show on homepage</span>
+        </label>
+
+        <button type="submit" class="btn btn-blue" style="padding: 10px 24px; font-weight: 700;">
+          <i class="fa fa-plus"></i> Publish Event
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- All Events List Card -->
+<div class="panel">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-calendar-days"></i></span>
+      <h2>Events</h2>
+      <span class="news-count-pill">{{ items|length }} Events</span>
+    </div>
+  </div>
+
+  <div class="event-list" id="eventList">
+    {% for item in items %}
+    <div class="event-item-row" id="event-row-{{ item.id }}">
+      <!-- Thumbnail -->
+      {% if item.image %}
+      <img src="{{ item.image }}" alt="{{ item.title }}" class="event-thumb" onerror="this.onerror=null;this.src='/static/img/event/1.jpg';">
+      {% else %}
+      <div class="event-thumb-placeholder"><i class="fa fa-calendar-days"></i></div>
+      {% endif %}
+
+      <!-- Info Cell -->
+      <div class="event-info-cell">
+        <span class="event-title-text" title="{{ item.title }}">{{ item.title }}</span>
+        <div class="event-meta-text">
+          <span><i class="fa fa-calendar"></i> {{ item.date or '—' }}{% if item.time %} <span style="opacity: 0.75;">({{ item.time }})</span>{% endif %}</span>
+          {% if item.location %}
+          <span><i class="fa fa-location-dot"></i> {{ item.location }}</span>
+          {% endif %}
+          {% if item.form_link %}
+          <a href="{{ item.form_link|safe_url }}" target="_blank" class="meta-pdf-pill" title="Register / Form Link">
+            <i class="fa fa-wpforms"></i> Register
+          </a>
+          {% endif %}
+          {% if item.show_on_home %}
+          <span class="home-badge"><i class="fa fa-house"></i> Home</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- End of row: Status Pill + 3-dots Menu (strictly pinned at end) -->
+      <div class="event-end-group">
+        {% if item.is_active %}
+        <span class="status-pill status-visible" title="Visible on site">
+          <i class="fa fa-circle-check"></i> Visible
+        </span>
+        {% else %}
+        <span class="status-pill status-hidden" title="Hidden from site">
+          <i class="fa fa-eye-slash"></i> Hidden
+        </span>
+        {% endif %}
+
+        <div class="event-actions-cell">
+          <button type="button" class="btn-dots event-menu-trigger" data-target="event-dropdown-{{ item.id }}" title="Actions">
+            <i class="fa fa-ellipsis-vertical"></i>
+          </button>
+          <div class="news-menu-dropdown event-menu-dropdown" id="event-dropdown-{{ item.id }}">
+            <button type="button" class="news-menu-item edit-event-trigger"
+                    data-id="{{ item.id }}"
+                    data-title="{{ item.title|e }}"
+                    data-content="{{ item.content|e }}"
+                    data-date="{{ (item.date or '')|e }}"
+                    data-time="{{ (item.time or '')|e }}"
+                    data-location="{{ (item.location or '')|e }}"
+                    data-form="{{ (item.form_link or '')|e }}"
+                    data-order="{{ item.order or 0 }}"
+                    data-image="{{ item.image or '' }}"
+                    data-home="{{ '1' if item.show_on_home else '0' }}">
+              <i class="fa fa-pen-to-square"></i> Edit
+            </button>
+
+            <form method="post" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item">
+                <i class="fa {{ 'fa-eye-slash' if item.is_active else 'fa-eye' }}"></i>
+                {{ 'Hide' if item.is_active else 'Show' }}
+              </button>
+            </form>
+
+            <form method="post" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this event?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item danger">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div style="padding: 36px 20px; text-align: center; color: var(--muted);">
+      <i class="fa fa-calendar-xmark" style="font-size: 32px; opacity: 0.35; margin-bottom: 10px; display: block;"></i>
+      No events published yet. Use the form above to add your first event.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Edit Event Modal -->
+<div class="modal-overlay" id="editEventModal" style="display: none;">
+  <div class="modal-content" style="max-width: 680px;">
+    <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="news-header-icon" style="width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-pen-to-square"></i></span>
+        <h3>Edit Event</h3>
+      </div>
+      <button type="button" class="modal-close" id="closeEditEventModal" aria-label="Close dialog">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form method="post" enctype="multipart/form-data" id="editEventForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="id" id="editEventId" value="">
+
+        <div class="form-grid">
+          <div class="full">
+            <label class="form-label" for="editEventTitle">Event title</label>
+            <input type="text" name="title" id="editEventTitle" required autocomplete="off">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editEventContent">Event description &amp; details</label>
+            <textarea name="content" id="editEventContent" rows="4" required></textarea>
+          </div>
+
+          <div>
+            <label class="form-label" for="editEventDate">Event date</label>
+            <input type="text" name="date" id="editEventDate">
+          </div>
+
+          <div>
+            <label class="form-label" for="editEventTime">Event time</label>
+            <input type="text" name="time" id="editEventTime">
+          </div>
+
+          <div>
+            <label class="form-label" for="editEventLocation">Location / Venue</label>
+            <input type="text" name="location" id="editEventLocation">
+          </div>
+
+          <div>
+            <label class="form-label" for="editEventOrder">Display order</label>
+            <input type="number" name="order" id="editEventOrder" value="0" min="0">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editEventFormLink">Registration / Form link</label>
+            <input type="url" name="form_link" id="editEventFormLink">
+          </div>
+
+          <!-- Cover Image in Modal -->
+          <div class="full">
+            <label class="form-label">Event poster image</label>
+            <div id="editCurrentEventPosterWrap" style="display: none; align-items: center; gap: 12px; margin-bottom: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;">
+              <img src="" alt="Current Poster" id="editCurrentEventPosterImg" style="width: 58px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12.5px; font-weight: 600; color: var(--text);">Current poster</div>
+                <div style="font-size: 11.5px; color: var(--muted); word-break: break-all;" id="editCurrentEventPosterPath"></div>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="editEventDropzone">
+              <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+              <div class="dropzone-title">Upload a new event poster</div>
+              <div class="dropzone-hint">PNG, JPG or WEBP (leave blank to keep current)</div>
+              <input type="file" name="image" id="editEventPosterInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+            </div>
+
+            <div class="dropzone-preview" id="editEventPosterPreview">
+              <img src="" alt="Preview" class="dropzone-preview-img" id="editEventPosterPreviewImg">
+              <div class="dropzone-preview-info">
+                <div class="dropzone-preview-name" id="editEventPosterPreviewName">poster.jpg</div>
+                <div class="dropzone-preview-size" id="editEventPosterPreviewSize">—</div>
+              </div>
+              <button type="button" class="dropzone-preview-remove" id="editEventPosterPreviewRemove" title="Remove selected image">
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+
+            <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter image path / URL</summary>
+              <input type="text" name="image_path" id="editEventPosterPathInput" placeholder="/static/img/event/1.jpg" style="margin-top: 6px;">
+            </details>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+          <label class="switch-label-wrap">
+            <input type="checkbox" name="show_on_home" class="switch-input" id="editEventShowHome">
+            <span class="switch-slider"></span>
+            <span class="switch-text">Show on homepage</span>
+          </label>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" id="cancelEditEventBtn">Cancel</button>
+            <button type="submit" class="btn btn-blue" style="padding: 10px 22px; font-weight: 700;">
+              <i class="fa fa-check"></i> Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function setupDropzone(dropzoneId, inputId, previewId, previewImgId, previewNameId, previewSizeId, removeBtnId) {
+    var dropzone = document.getElementById(dropzoneId);
+    var input = document.getElementById(inputId);
+    var preview = document.getElementById(previewId);
+    var previewImg = document.getElementById(previewImgId);
+    var previewName = document.getElementById(previewNameId);
+    var previewSize = document.getElementById(previewSizeId);
+    var removeBtn = document.getElementById(removeBtnId);
+
+    if (!dropzone || !input) return;
+
+    ['dragenter', 'dragover'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', function(e){
+      var dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) {
+        input.files = dt.files;
+        handleFiles(input.files);
+      }
+    });
+
+    input.addEventListener('change', function(){
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      if (!files || !files.length) return;
+      var file = files[0];
+      if (previewName) previewName.textContent = file.name;
+      if (previewSize) previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+      var reader = new FileReader();
+      reader.onload = function(e){
+        if (previewImg) previewImg.src = e.target.result;
+        if (preview) preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        if (preview) preview.classList.remove('show');
+        if (previewImg) previewImg.src = '';
+      });
+    }
+  }
+
+  setupDropzone('createEventDropzone', 'createEventInput', 'createEventPreview', 'createEventPreviewImg', 'createEventPreviewName', 'createEventPreviewSize', 'createEventPreviewRemove');
+  setupDropzone('editEventDropzone', 'editEventPosterInput', 'editEventPosterPreview', 'editEventPosterPreviewImg', 'editEventPosterPreviewName', 'editEventPosterPreviewSize', 'editEventPosterPreviewRemove');
+
+  // Three-Dots Menu Toggle
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('.event-menu-trigger');
+    var isInsideDropdown = e.target.closest('.event-menu-dropdown');
+
+    if (trigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      var targetId = trigger.getAttribute('data-target');
+      var dropdown = document.getElementById(targetId);
+
+      document.querySelectorAll('.event-menu-dropdown.show').forEach(function(d){
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        if (b !== trigger) b.classList.remove('active');
+      });
+
+      if (dropdown) {
+        var rect = trigger.getBoundingClientRect();
+        var spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 180 && rect.top > 180) {
+          dropdown.classList.add('dropup');
+        } else {
+          dropdown.classList.remove('dropup');
+        }
+        dropdown.classList.toggle('show');
+        trigger.classList.toggle('active');
+      }
+      return;
+    }
+
+    if (!isInsideDropdown) {
+      document.querySelectorAll('.event-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        b.classList.remove('active');
+      });
+    }
+  });
+
+  // Edit Modal Functionality
+  var editModal = document.getElementById('editEventModal');
+  var closeBtn = document.getElementById('closeEditEventModal');
+  var cancelBtn = document.getElementById('cancelEditEventBtn');
+
+  function openEditModal(data) {
+    document.getElementById('editEventId').value = data.id || '';
+    document.getElementById('editEventTitle').value = data.title || '';
+    document.getElementById('editEventContent').value = data.content || '';
+    document.getElementById('editEventDate').value = data.date || '';
+    document.getElementById('editEventTime').value = data.time || '';
+    document.getElementById('editEventLocation').value = data.location || '';
+    document.getElementById('editEventFormLink').value = data.form || '';
+    document.getElementById('editEventOrder').value = data.order || 0;
+    document.getElementById('editEventShowHome').checked = (data.home === '1' || data.home === true);
+
+    var fileInput = document.getElementById('editEventPosterInput');
+    if (fileInput) fileInput.value = '';
+    var preview = document.getElementById('editEventPosterPreview');
+    if (preview) preview.classList.remove('show');
+
+    // Poster preview
+    var posterWrap = document.getElementById('editCurrentEventPosterWrap');
+    var posterImg = document.getElementById('editCurrentEventPosterImg');
+    var posterPath = document.getElementById('editCurrentEventPosterPath');
+    var posterPathInput = document.getElementById('editEventPosterPathInput');
+    if (data.image) {
+      posterImg.src = data.image;
+      posterPath.textContent = data.image;
+      posterWrap.style.display = 'flex';
+      posterPathInput.value = data.image;
+    } else {
+      posterWrap.style.display = 'none';
+      posterPathInput.value = '';
+    }
+
+    editModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEditModal() {
+    editModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', function(e){
+    var editBtn = e.target.closest('.edit-event-trigger');
+    if (editBtn) {
+      e.preventDefault();
+      document.querySelectorAll('.event-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      var data = {
+        id: editBtn.getAttribute('data-id'),
+        title: editBtn.getAttribute('data-title'),
+        content: editBtn.getAttribute('data-content'),
+        date: editBtn.getAttribute('data-date'),
+        time: editBtn.getAttribute('data-time'),
+        location: editBtn.getAttribute('data-location'),
+        form: editBtn.getAttribute('data-form'),
+        order: editBtn.getAttribute('data-order'),
+        image: editBtn.getAttribute('data-image'),
+        home: editBtn.getAttribute('data-home')
+      };
+      openEditModal(data);
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
+
+  if (editModal) {
+    editModal.addEventListener('click', function(e){
+      if (e.target === editModal) closeEditModal();
+    });
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && editModal && editModal.style.display === 'flex') {
+      closeEditModal();
+    }
+  });
+})();
+</script>
+{% endblock %}

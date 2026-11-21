@@ -1,0 +1,221 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{{ item.title }} - Upcoming Course - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/pages/upcoming_detail-2.css') }}">
+</head>
+
+<body>
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis">
+                <div></div><div></div><div></div><div></div>
+            </div>
+        </div>
+    </div>
+    <div class="as-mainwrapper">
+        <div class="bg-white">
+
+            {% include 'includes/header.html' %}
+
+            <!-- Breadcrumb Banner -->
+            <div class="page-banner-area"
+                style="background-image:url({{ url_for('static', filename='img/banner/logo101.png') }});">
+                <div class="container">
+                    <div class="page-banner-content">
+                        <h1>UPCOMING COURSE</h1>
+                        <ul class="page-breadcrumb">
+                            <li><a href="{{ url_for('public.index') }}">Home</a></li>
+                            <li><a href="{{ url_for('public.courses') }}">Courses</a></li>
+                            <li>{{ item.title }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Area -->
+            <div class="upcoming-detail-wrap">
+                <div class="container">
+                    <div class="row">
+                        <!-- Main Content -->
+                        <div class="col-lg-8 col-md-12">
+                            <div class="upcoming-main-card">
+                                {% if item.batch_name %}
+                                <span class="upcoming-header-badge">{{ item.batch_name }}</span>
+                                {% endif %}
+                                <h1 class="upcoming-title">{{ item.title }}</h1>
+
+                                <!-- Quick Info Strip -->
+                                <div class="upcoming-info-strip">
+                                    {% if item.start_date %}
+                                    <div class="info-strip-item">
+                                        <i class="zmdi zmdi-calendar-check"></i>
+                                        <div>
+                                            <span>Starts:</span><br>
+                                            <strong>{{ item.start_date }}</strong>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if item.last_apply_date %}
+                                    <div class="info-strip-item">
+                                        <i class="zmdi zmdi-time"></i>
+                                        <div>
+                                            <span>Apply Deadline:</span><br>
+                                            <strong style="color:#dc2626;">{{ item.last_apply_date }}</strong>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if item.duration %}
+                                    <div class="info-strip-item">
+                                        <i class="zmdi zmdi-hourglass-alt"></i>
+                                        <div>
+                                            <span>Duration:</span><br>
+                                            <strong>{{ item.duration }}</strong>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if item.fee %}
+                                    <div class="info-strip-item">
+                                        <i class="zmdi zmdi-money"></i>
+                                        <div>
+                                            <span>Fee:</span><br>
+                                            <strong>{{ item.fee }}</strong>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if item.seats %}
+                                    <div class="info-strip-item">
+                                        <i class="zmdi zmdi-accounts-alt"></i>
+                                        <div>
+                                            <span>Seats:</span><br>
+                                            <strong>{{ item.seats }}</strong>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Cover Image -->
+                                <img src="{{ item.image or url_for('static', filename='img/course/1.jpg') }}"
+                                     alt="{{ item.title }}"
+                                     class="upcoming-cover-image"
+                                     onerror="this.src='{{ url_for('static', filename='img/course/1.jpg') }}'" loading="lazy" decoding="async">
+
+                                <!-- Apply CTA Banner -->
+                                <div class="apply-cta-box">
+                                    <div class="apply-cta-text">
+                                        <h3>Admissions Open for {{ item.batch_name or item.title }}</h3>
+                                        <p>Limited seats available. Submit your application form to secure enrollment.</p>
+                                    </div>
+                                    {% if item.form_link %}
+                                    <a href="{{ item.form_link|safe_url }}" target="_blank" rel="noopener noreferrer" class="upcoming-apply-btn-big">
+                                        <i class="zmdi zmdi-assignment-check"></i> Apply Now <i class="zmdi zmdi-open-in-new"></i>
+                                    </a>
+                                    {% else %}
+                                    <a href="{{ url_for('public.contact') }}" class="upcoming-apply-btn-big">
+                                        <i class="zmdi zmdi-assignment-check"></i> Inquire / Apply
+                                    </a>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Course Description Section -->
+                                <div class="upcoming-content-section">
+                                    <h3 class="upcoming-section-heading">
+                                        <i class="zmdi zmdi-file-text"></i> Course Overview &amp; Curriculum
+                                    </h3>
+                                    <div class="upcoming-description-text">
+                                        {{ item.description or 'Join this upcoming specialized course at AIMS Sukkur. Designed and taught by experienced industry practitioners, this program provides real-world hands-on projects, modern toolkits, and academic excellence.' }}
+                                    </div>
+                                </div>
+
+                                <!-- Instructor Section -->
+                                {% if item.instructor %}
+                                <div class="upcoming-content-section">
+                                    <h3 class="upcoming-section-heading">
+                                        <i class="zmdi zmdi-account-box"></i> Course Instructor
+                                    </h3>
+                                    <div class="instructor-card-strip">
+                                        <img src="{{ url_for('static', filename='img/teacher/1.png') }}" alt="{{ item.instructor }}" class="instructor-avatar-mini" loading="lazy" decoding="async">
+                                        <div>
+                                            <strong style="color:#1F3971;font-size:16px;">{{ item.instructor }}</strong>
+                                            <span style="display:block;color:#64748b;font-size:13px;">Lead Faculty &amp; Instructor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eef2f6;">
+                                    <a href="{{ url_for('public.courses') }}" class="button-default button-large">
+                                        <i class="zmdi zmdi-chevron-left"></i> Back to Courses
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="col-lg-4 col-md-12">
+                            <!-- Quick Registration Sidebar Box -->
+                            <div class="upcoming-side-panel">
+                                <span class="side-panel-title">Online Registration</span>
+                                <p style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px;">
+                                    Click below to fill the official application form for {{ item.title }}.
+                                </p>
+                                {% if item.form_link %}
+                                <a href="{{ item.form_link|safe_url }}" target="_blank" rel="noopener noreferrer" class="upcoming-apply-btn-big" style="width:100%;justify-content:center;box-sizing:border-box;">
+                                    <i class="zmdi zmdi-assignment-check"></i> Fill Form <i class="zmdi zmdi-open-in-new"></i>
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('public.contact') }}" class="upcoming-apply-btn-big" style="width:100%;justify-content:center;box-sizing:border-box;">
+                                    <i class="zmdi zmdi-phone"></i> Inquire Desk
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <!-- Other Upcoming Courses -->
+                            <div class="upcoming-side-panel">
+                                <span class="side-panel-title">Other Upcoming Batches</span>
+                                <div class="side-upcoming-list">
+                                    {% if related %}
+                                    {% for r in related %}
+                                    <a href="{{ url_for('public.upcoming_detail', course_id=r.id) }}" class="side-upcoming-item">
+                                        <img src="{{ r.image or url_for('static', filename='img/course/1.jpg') }}" alt="{{ r.title }}" class="side-upcoming-thumb" onerror="this.src='{{ url_for('static', filename='img/course/1.jpg') }}'" loading="lazy" decoding="async">
+                                        <div class="side-upcoming-meta">
+                                            <h5>{{ r.title }}</h5>
+                                            {% if r.batch_name %}
+                                            <span style="color:#b45309;font-weight:600;">{{ r.batch_name }}</span>
+                                            {% endif %}
+                                            <span>Starts: {{ r.start_date or 'TBA' }}</span>
+                                        </div>
+                                    </a>
+                                    {% endfor %}
+                                    {% else %}
+                                    <p style="font-size:13px;color:#94a3b8;margin:0;">No other upcoming batches currently.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+    {% include 'includes/scripts.html' %}
+</body>
+
+</html>

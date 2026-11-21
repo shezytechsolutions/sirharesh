@@ -1,0 +1,196 @@
+/*-----------------------------------------------------------------------------------
+
+    File: admin/global.css  (ADMIN - GLOBAL)
+    Purpose: Layout and styling shared by every admin page that extends
+             admin/base.html - sidebar, topbar, cards, buttons, tables,
+             alerts, badges. Page-specific admin styles (e.g. edit_page.html)
+             live in their own file under static/css/admin/, following the
+             same pattern as the public site's style.css / home.css split.
+
+-----------------------------------------------------------------------------------*/
+
+        :root {
+            --sidebar-w: 240px;
+            --accent: #FFAE27;
+            --dark: #1a1a2e;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+        .admin-wrap { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--dark);
+            color: #fff;
+            flex-shrink: 0;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.25s;
+        }
+        .sidebar .brand {
+            padding: 20px 18px;
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            color: var(--accent);
+        }
+        .sidebar nav a {
+            display: block;
+            padding: 12px 18px;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            border-left-color: var(--accent);
+        }
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            min-width: 0;
+        }
+        .topbar {
+            background: #fff;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e8ecf1;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        .content { padding: 24px; }
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 20px;
+            color: var(--dark);
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            padding: 22px;
+            margin-bottom: 20px;
+            border: 1px solid #eef1f5;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #eef1f5;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-card .lbl {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fb; font-weight: 600; color: #555; }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: #e09a1f; color: #fff; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #555;
+        }
+        .form-row { margin-bottom: 14px; }
+        .form-row label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+        .form-row input, .form-row textarea, .form-row select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-row input:focus, .form-row textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .alert {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        .alert-success { background: #e6ffed; color: #006622; }
+        .alert-danger { background: #fee; color: #c00; }
+        .alert-info { background: #e6f3ff; color: #004080; }
+        .alert-warning { background: #fff8e6; color: #996600; }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main { margin-left: 0; }
+            .topbar .menu-toggle { display: block; }
+            .content { padding: 16px; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 90;
+        }
+        .overlay.show { display: block; }

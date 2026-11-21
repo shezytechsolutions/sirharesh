@@ -1,0 +1,533 @@
+{% extends 'admin/base.html' %}
+{% block title %}E-Library Books - Admin{% endblock %}
+{% block page_title %}E-Library{% endblock %}
+
+{% block content %}
+<!-- Add Book Card -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-book-medical"></i></span>
+      <h2>Add Book</h2>
+    </div>
+  </div>
+  <div class="panel-body">
+    <form method="post" enctype="multipart/form-data" id="createBookForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add">
+
+      <div class="form-grid">
+        <div class="full">
+          <label class="form-label" for="bookTitle">Book title</label>
+          <input type="text" name="title" id="bookTitle" placeholder="e.g. Fundamental Computer Science Study Guide" required autocomplete="off">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="bookDesc">Description / Overview</label>
+          <textarea name="description" id="bookDesc" rows="3" placeholder="Summary, topics covered, target students, table of contents outline..."></textarea>
+        </div>
+
+        <div>
+          <label class="form-label" for="bookAuthor">Author / Publisher</label>
+          <input type="text" name="author" id="bookAuthor" placeholder="e.g. AIMS Sukkur Press / Dr. Khan">
+        </div>
+
+        <div>
+          <label class="form-label" for="bookBadge">Tag / Badge</label>
+          <input type="text" name="badge" id="bookBadge" placeholder="e.g. Reference / 2026 Edition">
+        </div>
+
+        <div>
+          <label class="form-label" for="bookPages">Page count</label>
+          <input type="text" name="pages" id="bookPages" placeholder="e.g. 240 pages">
+        </div>
+
+        <div>
+          <label class="form-label" for="bookOrder">Display order</label>
+          <input type="number" name="order" id="bookOrder" value="0" min="0">
+        </div>
+
+        <!-- Digital PDF Upload -->
+        <div class="full">
+          <label class="form-label" for="bookPdf">Digital book edition (PDF)</label>
+          <input type="file" name="pdf" id="bookPdf" accept=".pdf,application/pdf">
+          <details style="font-size: 11.5px; color: var(--muted); margin-top: 4px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter PDF path / URL</summary>
+            <input type="text" name="pdf_path" id="bookPdfPath" placeholder="/static/uploads/books/sample_book.pdf" style="margin-top: 4px;">
+          </details>
+        </div>
+
+        <!-- Cover Image Drag & Drop -->
+        <div class="full">
+          <label class="form-label">Book cover image</label>
+          <div class="upload-dropzone" id="createBookDropzone">
+            <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+            <div class="dropzone-title">Upload book cover</div>
+            <div class="dropzone-hint">PNG, JPG or WEBP (Book portrait ratio recommended)</div>
+            <input type="file" name="image" id="createBookInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+          </div>
+          <div class="dropzone-preview" id="createBookPreview">
+            <img src="" alt="Preview" class="dropzone-preview-img" id="createBookPreviewImg" style="width: 38px; height: 50px;">
+            <div class="dropzone-preview-info">
+              <div class="dropzone-preview-name" id="createBookPreviewName">cover.jpg</div>
+              <div class="dropzone-preview-size" id="createBookPreviewSize">—</div>
+            </div>
+            <button type="button" class="dropzone-preview-remove" id="createBookPreviewRemove" title="Remove image">
+              <i class="fa fa-xmark"></i>
+            </button>
+          </div>
+          <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter cover image path / URL</summary>
+            <input type="text" name="image_path" id="createBookPath" placeholder="/static/img/product/16.jpg" style="margin-top: 6px;">
+          </details>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+        <label class="switch-label-wrap">
+          <input type="checkbox" name="show_on_home" class="switch-input" id="createBookShowHome" checked>
+          <span class="switch-slider"></span>
+          <span class="switch-text">Show on homepage</span>
+        </label>
+
+        <button type="submit" class="btn btn-blue" style="padding: 10px 24px; font-weight: 700;">
+          <i class="fa fa-plus"></i> Add Book
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- All Books List Card -->
+<div class="panel">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-book"></i></span>
+      <h2>E-Library Books</h2>
+      <span class="news-count-pill">{{ items|length }} Books</span>
+    </div>
+  </div>
+
+  <div class="book-list" id="bookList">
+    {% for item in items %}
+    <div class="book-item-row" id="book-row-{{ item.id }}">
+      <!-- Cover Thumbnail -->
+      {% if item.image %}
+      <img src="{{ item.image }}" alt="{{ item.title }}" class="book-thumb" onerror="this.onerror=null;this.src='/static/img/product/16.jpg';">
+      {% else %}
+      <div class="book-thumb-placeholder"><i class="fa fa-book"></i></div>
+      {% endif %}
+
+      <!-- Info Cell -->
+      <div class="book-info-cell">
+        <span class="book-title-text" title="{{ item.title }}">{{ item.title }}</span>
+        <div class="book-meta-text">
+          {% if item.author %}
+          <span><i class="fa fa-user-pen"></i> {{ item.author }}</span>
+          {% endif %}
+          {% if item.pages %}
+          <span><i class="fa fa-file-lines"></i> {{ item.pages }}</span>
+          {% endif %}
+          {% if item.badge %}
+          <span class="meta-pill-tag"><i class="fa fa-tag"></i> {{ item.badge }}</span>
+          {% endif %}
+          {% if item.pdf %}
+          <a href="{{ item.pdf|safe_url }}" target="_blank" class="meta-pdf-pill" title="Read / Download PDF">
+            <i class="fa fa-file-pdf"></i> PDF
+          </a>
+          {% endif %}
+          {% if item.show_on_home %}
+          <span class="home-badge"><i class="fa fa-house"></i> Home</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- End of row: Status Pill + 3-dots Menu (strictly pinned at end) -->
+      <div class="book-end-group">
+        {% if item.is_active %}
+        <span class="status-pill status-visible" title="Visible on site">
+          <i class="fa fa-circle-check"></i> Visible
+        </span>
+        {% else %}
+        <span class="status-pill status-hidden" title="Hidden from site">
+          <i class="fa fa-eye-slash"></i> Hidden
+        </span>
+        {% endif %}
+
+        <div class="book-actions-cell">
+          <button type="button" class="btn-dots book-menu-trigger" data-target="book-dropdown-{{ item.id }}" title="Actions">
+            <i class="fa fa-ellipsis-vertical"></i>
+          </button>
+          <div class="news-menu-dropdown book-menu-dropdown" id="book-dropdown-{{ item.id }}">
+            <button type="button" class="news-menu-item edit-book-trigger"
+                    data-id="{{ item.id }}"
+                    data-title="{{ item.title|e }}"
+                    data-desc="{{ (item.description or '')|e }}"
+                    data-author="{{ (item.author or '')|e }}"
+                    data-pages="{{ (item.pages or '')|e }}"
+                    data-badge="{{ (item.badge or '')|e }}"
+                    data-order="{{ item.order or 0 }}"
+                    data-image="{{ item.image or '' }}"
+                    data-pdf="{{ item.pdf or '' }}"
+                    data-home="{{ '1' if item.show_on_home else '0' }}">
+              <i class="fa fa-pen-to-square"></i> Edit
+            </button>
+
+            <form method="post" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item">
+                <i class="fa {{ 'fa-eye-slash' if item.is_active else 'fa-eye' }}"></i>
+                {{ 'Hide' if item.is_active else 'Show' }}
+              </button>
+            </form>
+
+            <form method="post" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this book?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item danger">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div style="padding: 36px 20px; text-align: center; color: var(--muted);">
+      <i class="fa fa-book-open" style="font-size: 32px; opacity: 0.35; margin-bottom: 10px; display: block;"></i>
+      No books published yet. Use the form above to add your first book.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Edit Book Modal -->
+<div class="modal-overlay" id="editBookModal" style="display: none;">
+  <div class="modal-content" style="max-width: 680px;">
+    <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="news-header-icon" style="width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-pen-to-square"></i></span>
+        <h3>Edit Book</h3>
+      </div>
+      <button type="button" class="modal-close" id="closeEditBookModal" aria-label="Close dialog">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form method="post" enctype="multipart/form-data" id="editBookForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="id" id="editBookId" value="">
+
+        <div class="form-grid">
+          <div class="full">
+            <label class="form-label" for="editBookTitle">Book title</label>
+            <input type="text" name="title" id="editBookTitle" required autocomplete="off">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editBookDesc">Description / Overview</label>
+            <textarea name="description" id="editBookDesc" rows="3"></textarea>
+          </div>
+
+          <div>
+            <label class="form-label" for="editBookAuthor">Author / Publisher</label>
+            <input type="text" name="author" id="editBookAuthor">
+          </div>
+
+          <div>
+            <label class="form-label" for="editBookBadge">Tag / Badge</label>
+            <input type="text" name="badge" id="editBookBadge">
+          </div>
+
+          <div>
+            <label class="form-label" for="editBookPages">Page count</label>
+            <input type="text" name="pages" id="editBookPages">
+          </div>
+
+          <div>
+            <label class="form-label" for="editBookOrder">Display order</label>
+            <input type="number" name="order" id="editBookOrder" value="0" min="0">
+          </div>
+
+          <!-- Digital PDF in Modal -->
+          <div class="full">
+            <label class="form-label">Digital book edition (PDF)</label>
+            <div id="editCurrentBookPdfWrap" style="font-size: 12px; margin-bottom: 6px; display: none;">
+              <span style="color: var(--muted);">Current: </span>
+              <a href="" target="_blank" id="editCurrentBookPdfLink" style="color: var(--secondary); font-weight: 600; text-decoration: underline;"></a>
+            </div>
+            <input type="file" name="pdf" id="editBookPdfInput" accept=".pdf,application/pdf">
+            <details style="font-size: 11.5px; color: var(--muted); margin-top: 4px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter PDF path / URL</summary>
+              <input type="text" name="pdf_path" id="editBookPdfPath" placeholder="/static/uploads/books/sample.pdf" style="margin-top: 4px;">
+            </details>
+          </div>
+
+          <!-- Cover Image in Modal -->
+          <div class="full">
+            <label class="form-label">Book cover image</label>
+            <div id="editCurrentBookCoverWrap" style="display: none; align-items: center; gap: 12px; margin-bottom: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;">
+              <img src="" alt="Current Cover" id="editCurrentBookCoverImg" style="width: 38px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12.5px; font-weight: 600; color: var(--text);">Current cover</div>
+                <div style="font-size: 11.5px; color: var(--muted); word-break: break-all;" id="editCurrentBookCoverPath"></div>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="editBookDropzone">
+              <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+              <div class="dropzone-title">Upload a new cover image</div>
+              <div class="dropzone-hint">PNG, JPG or WEBP (leave blank to keep current)</div>
+              <input type="file" name="image" id="editBookCoverInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+            </div>
+
+            <div class="dropzone-preview" id="editBookCoverPreview">
+              <img src="" alt="Preview" class="dropzone-preview-img" id="editBookCoverPreviewImg" style="width: 38px; height: 50px;">
+              <div class="dropzone-preview-info">
+                <div class="dropzone-preview-name" id="editBookCoverPreviewName">cover.jpg</div>
+                <div class="dropzone-preview-size" id="editBookCoverPreviewSize">—</div>
+              </div>
+              <button type="button" class="dropzone-preview-remove" id="editBookCoverPreviewRemove" title="Remove selected image">
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+
+            <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter cover image path / URL</summary>
+              <input type="text" name="image_path" id="editBookCoverPathInput" placeholder="/static/img/product/16.jpg" style="margin-top: 6px;">
+            </details>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+          <label class="switch-label-wrap">
+            <input type="checkbox" name="show_on_home" class="switch-input" id="editBookShowHome">
+            <span class="switch-slider"></span>
+            <span class="switch-text">Show on homepage</span>
+          </label>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" id="cancelEditBookBtn">Cancel</button>
+            <button type="submit" class="btn btn-blue" style="padding: 10px 22px; font-weight: 700;">
+              <i class="fa fa-check"></i> Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function setupDropzone(dropzoneId, inputId, previewId, previewImgId, previewNameId, previewSizeId, removeBtnId) {
+    var dropzone = document.getElementById(dropzoneId);
+    var input = document.getElementById(inputId);
+    var preview = document.getElementById(previewId);
+    var previewImg = document.getElementById(previewImgId);
+    var previewName = document.getElementById(previewNameId);
+    var previewSize = document.getElementById(previewSizeId);
+    var removeBtn = document.getElementById(removeBtnId);
+
+    if (!dropzone || !input) return;
+
+    ['dragenter', 'dragover'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', function(e){
+      var dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) {
+        input.files = dt.files;
+        handleFiles(input.files);
+      }
+    });
+
+    input.addEventListener('change', function(){
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      if (!files || !files.length) return;
+      var file = files[0];
+      if (previewName) previewName.textContent = file.name;
+      if (previewSize) previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+      var reader = new FileReader();
+      reader.onload = function(e){
+        if (previewImg) previewImg.src = e.target.result;
+        if (preview) preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        if (preview) preview.classList.remove('show');
+        if (previewImg) previewImg.src = '';
+      });
+    }
+  }
+
+  setupDropzone('createBookDropzone', 'createBookInput', 'createBookPreview', 'createBookPreviewImg', 'createBookPreviewName', 'createBookPreviewSize', 'createBookPreviewRemove');
+  setupDropzone('editBookDropzone', 'editBookCoverInput', 'editBookCoverPreview', 'editBookCoverPreviewImg', 'editBookCoverPreviewName', 'editBookCoverPreviewSize', 'editBookCoverPreviewRemove');
+
+  // Three-Dots Menu Toggle
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('.book-menu-trigger');
+    var isInsideDropdown = e.target.closest('.book-menu-dropdown');
+
+    if (trigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      var targetId = trigger.getAttribute('data-target');
+      var dropdown = document.getElementById(targetId);
+
+      document.querySelectorAll('.book-menu-dropdown.show').forEach(function(d){
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        if (b !== trigger) b.classList.remove('active');
+      });
+
+      if (dropdown) {
+        var rect = trigger.getBoundingClientRect();
+        var spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 180 && rect.top > 180) {
+          dropdown.classList.add('dropup');
+        } else {
+          dropdown.classList.remove('dropup');
+        }
+        dropdown.classList.toggle('show');
+        trigger.classList.toggle('active');
+      }
+      return;
+    }
+
+    if (!isInsideDropdown) {
+      document.querySelectorAll('.book-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        b.classList.remove('active');
+      });
+    }
+  });
+
+  // Edit Modal Functionality
+  var editModal = document.getElementById('editBookModal');
+  var closeBtn = document.getElementById('closeEditBookModal');
+  var cancelBtn = document.getElementById('cancelEditBookBtn');
+
+  function openEditModal(data) {
+    document.getElementById('editBookId').value = data.id || '';
+    document.getElementById('editBookTitle').value = data.title || '';
+    document.getElementById('editBookDesc').value = data.desc || '';
+    document.getElementById('editBookAuthor').value = data.author || '';
+    document.getElementById('editBookPages').value = data.pages || '';
+    document.getElementById('editBookBadge').value = data.badge || '';
+    document.getElementById('editBookOrder').value = data.order || 0;
+    document.getElementById('editBookShowHome').checked = (data.home === '1' || data.home === true);
+
+    var fileInput = document.getElementById('editBookCoverInput');
+    if (fileInput) fileInput.value = '';
+    var pdfInput = document.getElementById('editBookPdfInput');
+    if (pdfInput) pdfInput.value = '';
+    var preview = document.getElementById('editBookCoverPreview');
+    if (preview) preview.classList.remove('show');
+
+    // Cover preview
+    var coverWrap = document.getElementById('editCurrentBookCoverWrap');
+    var coverImg = document.getElementById('editCurrentBookCoverImg');
+    var coverPath = document.getElementById('editCurrentBookCoverPath');
+    var coverPathInput = document.getElementById('editBookCoverPathInput');
+    if (data.image) {
+      coverImg.src = data.image;
+      coverPath.textContent = data.image;
+      coverWrap.style.display = 'flex';
+      coverPathInput.value = data.image;
+    } else {
+      coverWrap.style.display = 'none';
+      coverPathInput.value = '';
+    }
+
+    // PDF preview
+    var pdfWrap = document.getElementById('editCurrentBookPdfWrap');
+    var pdfLink = document.getElementById('editCurrentBookPdfLink');
+    var pdfPathInput = document.getElementById('editBookPdfPath');
+    if (data.pdf) {
+      pdfLink.href = data.pdf;
+      pdfLink.textContent = data.pdf.split('/').pop() || data.pdf;
+      pdfWrap.style.display = 'block';
+      pdfPathInput.value = data.pdf;
+    } else {
+      pdfWrap.style.display = 'none';
+      pdfPathInput.value = '';
+    }
+
+    editModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEditModal() {
+    editModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', function(e){
+    var editBtn = e.target.closest('.edit-book-trigger');
+    if (editBtn) {
+      e.preventDefault();
+      document.querySelectorAll('.book-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      var data = {
+        id: editBtn.getAttribute('data-id'),
+        title: editBtn.getAttribute('data-title'),
+        desc: editBtn.getAttribute('data-desc'),
+        author: editBtn.getAttribute('data-author'),
+        pages: editBtn.getAttribute('data-pages'),
+        badge: editBtn.getAttribute('data-badge'),
+        order: editBtn.getAttribute('data-order'),
+        image: editBtn.getAttribute('data-image'),
+        pdf: editBtn.getAttribute('data-pdf'),
+        home: editBtn.getAttribute('data-home')
+      };
+      openEditModal(data);
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
+
+  if (editModal) {
+    editModal.addEventListener('click', function(e){
+      if (e.target === editModal) closeEditModal();
+    });
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && editModal && editModal.style.display === 'flex') {
+      closeEditModal();
+    }
+  });
+})();
+</script>
+{% endblock %}

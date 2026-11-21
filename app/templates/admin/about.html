@@ -1,0 +1,780 @@
+{% extends 'admin/base.html' %}
+{% block title %}About Page Customization - AIMS Sukkur Admin{% endblock %}
+{% block page_title %}About page{% endblock %}
+
+{% block content %}
+<!-- Page Header Navigation & View Button -->
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+  <div>
+    <h2 style="font-size:20px;font-weight:700;color:var(--navy);margin:0;">About Page Customization</h2>
+    <p style="font-size:13px;color:var(--muted);margin:4px 0 0;">Manage your About Story, Mission &amp; Vision pillars, Why Choose Us highlights, and Faculty &amp; Team members in one place.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('public.about') }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+      <i class="fa fa-arrow-up-right-from-square"></i> View Live About Page
+    </a>
+  </div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="home-tabs" id="aboutTabs">
+  <button type="button" class="home-tab-btn active" data-tab="story">
+    <i class="fa fa-circle-info"></i> Story &amp; Pillars
+  </button>
+  <button type="button" class="home-tab-btn" data-tab="why-choose">
+    <i class="fa fa-star"></i> Why Choose Us <span class="tab-badge">{{ why_choose|length }}</span>
+  </button>
+  <button type="button" class="home-tab-btn" data-tab="team">
+    <i class="fa fa-users"></i> Faculty &amp; Team <span class="tab-badge">{{ team_members|length }}</span>
+  </button>
+</div>
+
+<!-- ============================================================= TAB 1: STORY & PILLARS -->
+<div class="home-tab-content active" id="tab-story">
+  <!-- Card 1: Story & Feature Image -->
+  <div class="panel">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-book-open" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">About Story &amp; Feature Media</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <form method="POST" action="{{ url_for('admin.admin_about') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="save_story">
+
+        <div class="hero-images-grid" style="align-items:start;">
+          <!-- Feature Image Column -->
+          <div class="hero-image-col">
+            <span class="hero-img-label">About Feature Image</span>
+            <div class="hero-img-row">
+              <div class="hero-thumb-box" style="width:200px;height:120px;">
+                <img id="aboutImgPreview"
+                     src="{{ (blocks.get('hero_image').image if blocks.get('hero_image') and blocks.get('hero_image').image) or url_for('static', filename='img/about/about-person.png') }}"
+                     alt="About Feature Image"
+                     onerror="this.src='/static/img/about/about-person.png'">
+              </div>
+              <div>
+                <label for="aboutImgInput" class="btn-change-pill">
+                  <i class="fa fa-cloud-arrow-up"></i> Change
+                </label>
+                <input type="file" id="aboutImgInput" name="hero_image" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="previewImg(this, 'aboutImgPreview', 'aboutImgPath')">
+                <input type="hidden" name="hero_image_path" id="aboutImgPath" value="{{ (blocks.get('hero_image').image if blocks.get('hero_image') and blocks.get('hero_image').image) or '' }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- Story Text Column -->
+          <div class="hero-image-col" style="border-right:none;padding-right:0;">
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:block;">Headline / Title</label>
+              <input type="text" name="hero_title" value="{{ (blocks.get('hero_title').title if blocks.get('hero_title')) or 'About AIMS Sukkur' }}" placeholder="About AIMS Sukkur">
+            </div>
+            <div class="form-group">
+              <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:block;">Story Overview Paragraph</label>
+              <textarea name="hero_text" rows="3" placeholder="Share your institution story and mission...">{{ (blocks.get('hero_text').content if blocks.get('hero_text')) or '' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+          <button type="submit" class="btn btn-blue" style="padding:10px 28px;font-weight:700;">
+            <i class="fa fa-check"></i> Save Story
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Card 2: Mission, Vision & Values (Pillars) -->
+  <div class="panel">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-compass" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Institutional Pillars (Mission, Vision &amp; Values)</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <form method="POST" action="{{ url_for('admin.admin_about') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="save_pillars">
+
+        <div class="stat-triple-grid">
+          <!-- Mission -->
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;">
+            <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);font-size:14px;margin-bottom:12px;">
+              <i class="fa fa-bullseye" style="color:var(--secondary);"></i> Our Mission
+            </div>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Title</label>
+              <input type="text" name="mission_title" value="{{ (blocks.get('mission').title if blocks.get('mission')) or 'Our Mission' }}" placeholder="Our Mission">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Description</label>
+              <textarea name="mission_text" rows="3" placeholder="Enter mission statement...">{{ (blocks.get('mission').content if blocks.get('mission')) or '' }}</textarea>
+            </div>
+          </div>
+
+          <!-- Vision -->
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;">
+            <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);font-size:14px;margin-bottom:12px;">
+              <i class="fa fa-eye" style="color:var(--secondary);"></i> Our Vision
+            </div>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Title</label>
+              <input type="text" name="vision_title" value="{{ (blocks.get('vision').title if blocks.get('vision')) or 'Our Vision' }}" placeholder="Our Vision">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Description</label>
+              <textarea name="vision_text" rows="3" placeholder="Enter vision statement...">{{ (blocks.get('vision').content if blocks.get('vision')) or '' }}</textarea>
+            </div>
+          </div>
+
+          <!-- Values -->
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;">
+            <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);font-size:14px;margin-bottom:12px;">
+              <i class="fa fa-gem" style="color:var(--secondary);"></i> Our Values
+            </div>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Title</label>
+              <input type="text" name="values_title" value="{{ (blocks.get('values').title if blocks.get('values')) or 'Our Values' }}" placeholder="Our Values">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">Description</label>
+              <textarea name="values_text" rows="3" placeholder="Enter core values...">{{ (blocks.get('values').content if blocks.get('values')) or '' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+          <button type="submit" class="btn btn-blue" style="padding:10px 28px;font-weight:700;">
+            <i class="fa fa-check"></i> Save Pillars
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= TAB 2: WHY CHOOSE US -->
+<div class="home-tab-content" id="tab-why-choose">
+  <!-- Add Feature Card -->
+  <div class="panel">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-plus" style="color:var(--navy);font-size:15px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Add Highlight Feature</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <form method="POST" action="{{ url_for('admin.admin_about') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="add_why">
+
+        <div class="hero-text-grid">
+          <div class="form-group">
+            <label>Feature Title <span style="color:var(--danger)">*</span></label>
+            <input type="text" name="title" required placeholder="e.g. Expert Faculty &amp; Modern Labs">
+          </div>
+          <div class="form-group">
+            <label>Icon Style</label>
+            <select name="icon" style="padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;color:var(--text);background:#fff;">
+              <option value="zmdi-accounts">Faculty / Team (zmdi-accounts)</option>
+              <option value="zmdi-library">Curriculum / Library (zmdi-library)</option>
+              <option value="zmdi-globe-alt">Global Exposure (zmdi-globe-alt)</option>
+              <option value="zmdi-shield-check">Safety &amp; Support (zmdi-shield-check)</option>
+              <option value="zmdi-graduation-cap">Accredited Degrees (zmdi-graduation-cap)</option>
+              <option value="zmdi-laptop">Modern Tech &amp; Labs (zmdi-laptop)</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Short Description</label>
+            <textarea name="content" rows="2" placeholder="Brief sentence highlighting this key benefit..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Display Order</label>
+            <input type="number" name="order" value="{{ why_choose|length + 1 }}" min="0">
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <button type="submit" class="btn btn-blue" style="padding:10px 24px;font-weight:700;height:42px;">
+              <i class="fa fa-plus"></i> Add Feature
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Active Features List -->
+  <div class="panel">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div class="news-header-box">
+        <span class="news-header-icon"><i class="fa fa-star"></i></span>
+        <h2>Why Choose Us Highlights</h2>
+        <span class="news-count-pill">{{ why_choose|length }} Features</span>
+      </div>
+    </div>
+
+    <div class="ff-list">
+      {% for w in why_choose %}
+      <div class="ff-item-row" id="why-row-{{ w.id }}">
+        <div class="ff-number-badge" style="font-size:15px;min-width:48px;">
+          <i class="zmdi {{ w.icon or 'zmdi-star' }}"></i>
+        </div>
+        <div class="ff-info">
+          <div class="ff-label-text">{{ w.title }}</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.4;">{{ w.content or '—' }}</div>
+        </div>
+        <div class="ff-end-group">
+          <span style="font-size:11px;font-weight:600;color:var(--muted);background:#f1f5f9;padding:3px 8px;border-radius:10px;">#{{ w.order or loop.index }}</span>
+          <div class="news-actions-cell">
+            <button type="button" class="btn-dots about-menu-trigger" data-target="why-drop-{{ w.id }}" title="Actions">
+              <i class="fa fa-ellipsis-vertical"></i>
+            </button>
+            <div class="news-menu-dropdown" id="why-drop-{{ w.id }}">
+              <button type="button" class="news-menu-item edit-why-btn"
+                      data-id="{{ w.id }}"
+                      data-title="{{ w.title|e }}"
+                      data-content="{{ (w.content or '')|e }}"
+                      data-icon="{{ (w.icon or 'zmdi-accounts')|e }}"
+                      data-order="{{ w.order or 0 }}">
+                <i class="fa fa-pen-to-square"></i> Edit Feature
+              </button>
+              <button type="button" class="news-menu-item danger delete-why-btn"
+                      data-id="{{ w.id }}"
+                      data-title="{{ w.title|e }}">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:36px;color:var(--muted);">
+        <i class="fa fa-star" style="font-size:26px;opacity:0.4;margin-bottom:8px;"></i>
+        <p style="margin:0;">No highlights added yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= TAB 3: FACULTY & TEAM -->
+<div class="home-tab-content" id="tab-team">
+  <!-- Add Faculty Member Form (Streamlined & Minimal inputs) -->
+  <div class="panel">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-user-plus" style="color:var(--navy);font-size:15px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Add Faculty / Team Member</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <form method="POST" action="{{ url_for('admin.admin_about') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="add_team">
+
+        <div class="hero-text-grid">
+          <div class="form-group">
+            <label>Full Name <span style="color:var(--danger)">*</span></label>
+            <input type="text" name="name" required placeholder="e.g. Dr. Derek Spafford">
+          </div>
+          <div class="form-group">
+            <label>Role / Designation</label>
+            <input type="text" name="role" placeholder="e.g. Professor of Design">
+          </div>
+          <div class="form-group">
+            <label>Qualification &amp; Degrees</label>
+            <input type="text" name="qualification" placeholder="e.g. MSc in Visual Communication, Royal College of Art">
+          </div>
+          <div class="form-group">
+            <label>Official Email</label>
+            <input type="email" name="email" placeholder="e.g. derek@aimssukkur.edu.pk">
+          </div>
+          <div class="form-group">
+            <label>LinkedIn / Profile URL</label>
+            <input type="text" name="linkedin" placeholder="https://linkedin.com/in/username">
+          </div>
+          <div class="form-group">
+            <label>Display Order</label>
+            <input type="number" name="order" value="{{ team_members|length + 1 }}" min="0">
+          </div>
+
+          <!-- Profile Photo with Change Pill Button -->
+          <div class="form-group full">
+            <label>Profile Photo</label>
+            <div style="display:flex;align-items:center;gap:18px;margin-top:6px;flex-wrap:wrap;">
+              <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:2px solid var(--navy);background:#f1f5f9;flex-shrink:0;">
+                <img id="teamAddPreview" src="/static/img/teacher/1.png" alt="Preview" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div>
+                <label for="teamAddInput" class="btn-change-pill">
+                  <i class="fa fa-cloud-arrow-up"></i> Select Photo
+                </label>
+                <input type="file" id="teamAddInput" name="image" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="previewImg(this, 'teamAddPreview', 'teamAddPath')">
+                <input type="hidden" name="image_path" id="teamAddPath" value="">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group full" style="display:flex;justify-content:flex-end;">
+            <button type="submit" class="btn btn-blue" style="padding:10px 24px;font-weight:700;">
+              <i class="fa fa-plus"></i> Add Faculty Member
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Faculty & Team List -->
+  <div class="panel">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div class="news-header-box">
+        <span class="news-header-icon"><i class="fa fa-users"></i></span>
+        <h2>Faculty &amp; Team Members</h2>
+        <span class="news-count-pill">{{ team_members|length }} Members</span>
+      </div>
+    </div>
+
+    <div class="t-list">
+      {% for m in team_members %}
+      <div class="t-item-row" id="team-row-{{ m.id }}">
+        <img src="{{ m.image or url_for('static', filename='img/teacher/1.png') }}"
+             alt="{{ m.name }}"
+             class="t-avatar"
+             onerror="this.src='/static/img/teacher/1.png'">
+
+        <div class="t-info-cell">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <strong class="t-author-name" style="font-size:14px;">{{ m.name }}</strong>
+            <span class="meta-pill-tag" style="background:#e0e9fa;color:var(--navy);font-weight:600;padding:2px 8px;border-radius:12px;font-size:11px;">
+              {{ m.role or 'Faculty' }}
+            </span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">
+            <i class="fa fa-graduation-cap" style="color:var(--secondary);font-size:11px;"></i>
+            {{ m.qualification or 'Faculty Member, AIMS Sukkur' }}
+          </div>
+        </div>
+
+        <div class="t-end-group">
+          {% if m.is_active %}
+          <span class="status-pill status-visible"><i class="fa fa-eye"></i> Visible</span>
+          {% else %}
+          <span class="status-pill status-hidden"><i class="fa fa-eye-slash"></i> Hidden</span>
+          {% endif %}
+
+          <div class="news-actions-cell">
+            <button type="button" class="btn-dots about-menu-trigger" data-target="team-drop-{{ m.id }}" title="Actions">
+              <i class="fa fa-ellipsis-vertical"></i>
+            </button>
+            <div class="news-menu-dropdown" id="team-drop-{{ m.id }}">
+              <button type="button" class="news-menu-item toggle-team-btn" data-id="{{ m.id }}">
+                <i class="fa {{ 'fa-eye-slash' if m.is_active else 'fa-eye' }}"></i> {{ 'Hide from Site' if m.is_active else 'Show on Site' }}
+              </button>
+              <button type="button" class="news-menu-item edit-team-btn"
+                      data-id="{{ m.id }}"
+                      data-name="{{ m.name|e }}"
+                      data-role="{{ (m.role or '')|e }}"
+                      data-qualification="{{ (m.qualification or '')|e }}"
+                      data-email="{{ (m.email or '')|e }}"
+                      data-linkedin="{{ (m.linkedin or '')|e }}"
+                      data-image="{{ (m.image or '')|e }}"
+                      data-order="{{ m.order or 0 }}">
+                <i class="fa fa-pen-to-square"></i> Edit Details
+              </button>
+              <button type="button" class="news-menu-item danger delete-team-btn"
+                      data-id="{{ m.id }}"
+                      data-name="{{ m.name|e }}">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:36px;color:var(--muted);">
+        <i class="fa fa-users" style="font-size:26px;opacity:0.4;margin-bottom:8px;"></i>
+        <p style="margin:0;">No faculty members listed yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= MODALS & HIDDEN FORMS -->
+<!-- Edit Why Choose Us Modal -->
+<div class="modal-overlay" id="editWhyModal" style="display:none;" onclick="if(event.target===this)closeEditWhyModal()">
+  <div class="modal-content" style="max-width:480px;">
+    <div class="modal-head">
+      <div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0;">Edit Why Choose Us Feature</h3>
+        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">Update feature title, description, or icon.</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeEditWhyModal()" aria-label="Close modal">
+        <i class="fa fa-xmark"></i>
+      </button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.admin_about') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="edit_why">
+      <input type="hidden" name="id" id="editWhyId" value="">
+
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label class="form-label">Feature Title <span style="color:var(--danger)">*</span></label>
+          <input type="text" name="title" id="editWhyTitle" required>
+        </div>
+        <div>
+          <label class="form-label">Icon Style</label>
+          <select name="icon" id="editWhyIcon" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;color:var(--text);background:#fff;">
+            <option value="zmdi-accounts">Faculty / Team (zmdi-accounts)</option>
+            <option value="zmdi-library">Curriculum / Library (zmdi-library)</option>
+            <option value="zmdi-globe-alt">Global Exposure (zmdi-globe-alt)</option>
+            <option value="zmdi-shield-check">Safety &amp; Support (zmdi-shield-check)</option>
+            <option value="zmdi-graduation-cap">Accredited Degrees (zmdi-graduation-cap)</option>
+            <option value="zmdi-laptop">Modern Tech &amp; Labs (zmdi-laptop)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Description</label>
+          <textarea name="content" id="editWhyContent" rows="2"></textarea>
+        </div>
+        <div>
+          <label class="form-label">Display Order</label>
+          <input type="number" name="order" id="editWhyOrder" min="0">
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" onclick="closeEditWhyModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Faculty Member Modal -->
+<div class="modal-overlay" id="editTeamModal" style="display:none;" onclick="if(event.target===this)closeEditTeamModal()">
+  <div class="modal-content" style="max-width:520px;">
+    <div class="modal-head">
+      <div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0;">Edit Faculty Member</h3>
+        <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">Update teacher details or photo.</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeEditTeamModal()" aria-label="Close modal">
+        <i class="fa fa-xmark"></i>
+      </button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.admin_about') }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="edit_team">
+      <input type="hidden" name="id" id="editTeamId" value="">
+
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label class="form-label">Full Name <span style="color:var(--danger)">*</span></label>
+          <input type="text" name="name" id="editTeamName" required>
+        </div>
+        <div>
+          <label class="form-label">Role / Designation</label>
+          <input type="text" name="role" id="editTeamRole">
+        </div>
+        <div>
+          <label class="form-label">Qualification &amp; Degrees</label>
+          <input type="text" name="qualification" id="editTeamQualification">
+        </div>
+        <div>
+          <label class="form-label">Official Email</label>
+          <input type="email" name="email" id="editTeamEmail">
+        </div>
+        <div>
+          <label class="form-label">LinkedIn / Profile URL</label>
+          <input type="text" name="linkedin" id="editTeamLinkedin">
+        </div>
+        <div>
+          <label class="form-label">Display Order</label>
+          <input type="number" name="order" id="editTeamOrder" min="0">
+        </div>
+        <div>
+          <label class="form-label">Update Photo</label>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:6px;">
+            <div style="width:50px;height:50px;border-radius:50%;overflow:hidden;border:1px solid var(--border);background:#f1f5f9;flex-shrink:0;">
+              <img id="editTeamPreviewImg" src="/static/img/teacher/1.png" alt="Preview" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div>
+              <label for="editTeamInput" class="btn-change-pill">
+                <i class="fa fa-cloud-arrow-up"></i> Change
+              </label>
+              <input type="file" id="editTeamInput" name="image" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="previewImg(this, 'editTeamPreviewImg', 'editTeamImagePath')">
+              <input type="hidden" name="image_path" id="editTeamImagePath" value="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" onclick="closeEditTeamModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Hidden Action Forms -->
+<form id="deleteWhyForm" method="POST" action="{{ url_for('admin.admin_about') }}" style="display:none;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="action" value="delete_why">
+  <input type="hidden" name="id" id="deleteWhyId">
+</form>
+
+<form id="toggleTeamForm" method="POST" action="{{ url_for('admin.admin_about') }}" style="display:none;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="action" value="toggle_team">
+  <input type="hidden" name="id" id="toggleTeamId">
+</form>
+
+<form id="deleteTeamForm" method="POST" action="{{ url_for('admin.admin_about') }}" style="display:none;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="action" value="delete_team">
+  <input type="hidden" name="id" id="deleteTeamId">
+</form>
+
+<script>
+/* ------------------------------------------------------------- Live Image Preview Helper */
+function previewImg(input, imgId, pathId) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById(imgId);
+      if (img) img.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+    if (pathId) {
+      const pathEl = document.getElementById(pathId);
+      if (pathEl) pathEl.value = '';
+    }
+  }
+}
+
+/* ------------------------------------------------------------- Tabs Handling */
+(function() {
+  const tabs = document.querySelectorAll('.home-tab-btn');
+  const panels = document.querySelectorAll('.home-tab-content');
+
+  function switchTab(tabId) {
+    tabs.forEach(t => {
+      if (t.getAttribute('data-tab') === tabId) {
+        t.classList.add('active');
+      } else {
+        t.classList.remove('active');
+      }
+    });
+
+    panels.forEach(p => {
+      if (p.id === 'tab-' + tabId) {
+        p.classList.add('active');
+      } else {
+        p.classList.remove('active');
+      }
+    });
+
+    if (history.replaceState) {
+      history.replaceState(null, null, '#' + tabId);
+    }
+  }
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', function() {
+      switchTab(this.getAttribute('data-tab'));
+    });
+  });
+
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById('tab-' + hash)) {
+    switchTab(hash);
+  }
+})();
+
+/* ------------------------------------------------------------- Why Choose Us Actions */
+function openEditWhyModal(id, title, content, icon, order) {
+  document.getElementById('editWhyId').value = id;
+  document.getElementById('editWhyTitle').value = title;
+  document.getElementById('editWhyContent').value = content;
+  document.getElementById('editWhyIcon').value = icon || 'zmdi-accounts';
+  document.getElementById('editWhyOrder').value = order;
+  document.getElementById('editWhyModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditWhyModal() {
+  document.getElementById('editWhyModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function confirmDeleteWhy(id, title) {
+  if (confirm('Delete highlight feature "' + title + '"?')) {
+    document.getElementById('deleteWhyId').value = id;
+    document.getElementById('deleteWhyForm').submit();
+  }
+}
+
+/* ------------------------------------------------------------- Faculty & Team Actions */
+function openEditTeamModal(id, name, role, qualification, email, linkedin, image, order) {
+  document.getElementById('editTeamId').value = id;
+  document.getElementById('editTeamName').value = name;
+  document.getElementById('editTeamRole').value = role || '';
+  document.getElementById('editTeamQualification').value = qualification || '';
+  document.getElementById('editTeamEmail').value = email || '';
+  document.getElementById('editTeamLinkedin').value = linkedin || '';
+  document.getElementById('editTeamImagePath').value = image || '';
+  document.getElementById('editTeamOrder').value = order;
+
+  const prev = document.getElementById('editTeamPreviewImg');
+  if (prev) prev.src = image || '/static/img/teacher/1.png';
+
+  document.getElementById('editTeamModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditTeamModal() {
+  document.getElementById('editTeamModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function toggleTeam(id) {
+  document.getElementById('toggleTeamId').value = id;
+  document.getElementById('toggleTeamForm').submit();
+}
+
+function confirmDeleteTeam(id, name) {
+  if (confirm('Delete faculty member "' + name + '"?')) {
+    document.getElementById('deleteTeamId').value = id;
+    document.getElementById('deleteTeamForm').submit();
+  }
+}
+
+// --- Three-Dots Dropdown Menu Toggle with Smart Dropup Positioning ---
+document.addEventListener('click', function(e) {
+  const trigger = e.target.closest('.about-menu-trigger');
+  const isInsideDropdown = e.target.closest('.news-menu-dropdown');
+
+  // 1. Toggle Dropdown on 3-dots click
+  if (trigger) {
+    e.preventDefault();
+    e.stopPropagation();
+    const targetId = trigger.getAttribute('data-target');
+    const dropdown = document.getElementById(targetId);
+
+    // Close all other dropdowns
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d) {
+      if (d !== dropdown) d.classList.remove('show');
+    });
+    document.querySelectorAll('.btn-dots.active').forEach(function(b) {
+      if (b !== trigger) b.classList.remove('active');
+    });
+
+    if (dropdown) {
+      // Smart viewport check: open upward if near bottom of viewport
+      var rect = trigger.getBoundingClientRect();
+      var spaceBelow = window.innerHeight - rect.bottom;
+      if (spaceBelow < 180 && rect.top > 180) {
+        dropdown.classList.add('dropup');
+      } else {
+        dropdown.classList.remove('dropup');
+      }
+
+      dropdown.classList.toggle('show');
+      trigger.classList.toggle('active');
+    }
+    return;
+  }
+
+  // 2. Edit Why Choose Us Action
+  const editWhyBtn = e.target.closest('.edit-why-btn');
+  if (editWhyBtn) {
+    e.preventDefault();
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d){ d.classList.remove('show'); });
+    openEditWhyModal(
+      editWhyBtn.getAttribute('data-id'),
+      editWhyBtn.getAttribute('data-title'),
+      editWhyBtn.getAttribute('data-content'),
+      editWhyBtn.getAttribute('data-icon'),
+      editWhyBtn.getAttribute('data-order')
+    );
+    return;
+  }
+
+  // 3. Delete Why Choose Us Action
+  const delWhyBtn = e.target.closest('.delete-why-btn');
+  if (delWhyBtn) {
+    e.preventDefault();
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d){ d.classList.remove('show'); });
+    confirmDeleteWhy(delWhyBtn.getAttribute('data-id'), delWhyBtn.getAttribute('data-title'));
+    return;
+  }
+
+  // 4. Toggle Faculty Visibility Action
+  const toggleTeamBtn = e.target.closest('.toggle-team-btn');
+  if (toggleTeamBtn) {
+    e.preventDefault();
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d){ d.classList.remove('show'); });
+    toggleTeam(toggleTeamBtn.getAttribute('data-id'));
+    return;
+  }
+
+  // 5. Edit Faculty Member Action
+  const editTeamBtn = e.target.closest('.edit-team-btn');
+  if (editTeamBtn) {
+    e.preventDefault();
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d){ d.classList.remove('show'); });
+    openEditTeamModal(
+      editTeamBtn.getAttribute('data-id'),
+      editTeamBtn.getAttribute('data-name'),
+      editTeamBtn.getAttribute('data-role'),
+      editTeamBtn.getAttribute('data-qualification'),
+      editTeamBtn.getAttribute('data-email'),
+      editTeamBtn.getAttribute('data-linkedin'),
+      editTeamBtn.getAttribute('data-image'),
+      editTeamBtn.getAttribute('data-order')
+    );
+    return;
+  }
+
+  // 6. Delete Faculty Member Action
+  const delTeamBtn = e.target.closest('.delete-team-btn');
+  if (delTeamBtn) {
+    e.preventDefault();
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d){ d.classList.remove('show'); });
+    confirmDeleteTeam(delTeamBtn.getAttribute('data-id'), delTeamBtn.getAttribute('data-name'));
+    return;
+  }
+
+  // 7. Click outside closes dropdowns
+  if (!isInsideDropdown) {
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d) {
+      d.classList.remove('show');
+    });
+    document.querySelectorAll('.btn-dots.active').forEach(function(b) {
+      b.classList.remove('active');
+    });
+  }
+});
+
+// ESC closes modals and dropdowns
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeEditWhyModal();
+    closeEditTeamModal();
+    document.querySelectorAll('.news-menu-dropdown.show').forEach(function(d) {
+      d.classList.remove('show');
+    });
+    document.querySelectorAll('.btn-dots.active').forEach(function(b) {
+      b.classList.remove('active');
+    });
+  }
+});
+</script>
+{% endblock %}

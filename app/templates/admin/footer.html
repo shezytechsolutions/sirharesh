@@ -1,0 +1,347 @@
+{% extends 'admin/base.html' %}
+{% block title %}Footer Customization - AIMS Sukkur Admin{% endblock %}
+{% block page_title %}Footer{% endblock %}
+
+{% block content %}
+<!-- Page Header Navigation & View Button -->
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+  <div>
+    <h2 style="font-size:20px;font-weight:700;color:var(--navy);margin:0;">Footer Customization</h2>
+    <p style="font-size:13px;color:var(--muted);margin:4px 0 0;">Manage footer branding, about summary, contact information, social profiles, and copyright.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('public.index') }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
+      <i class="fa fa-arrow-up-right-from-square"></i> View Live Site
+    </a>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('admin.admin_footer') }}" enctype="multipart/form-data" id="footerCustomizerForm">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <!-- Real-time Visual Preview Card -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:14px 20px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-eye" style="color:var(--navy);font-size:15px;"></i>
+        <h2 style="font-size:15px;font-weight:700;color:var(--navy);margin:0;">Footer Preview</h2>
+      </div>
+      <span style="font-size:11.5px;color:var(--muted);">Simulated live view</span>
+    </div>
+    <div class="panel-body" style="padding:18px;">
+      <div style="background:#111e38;color:#cbd5e1;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <!-- Main widgets preview -->
+        <div style="padding:22px;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:20px;">
+          <!-- Col 1: About & Logo -->
+          <div>
+            <div style="margin-bottom:10px;">
+              <img id="footerSimLogo"
+                   src="{{ settings.get('footer_logo') or url_for('static', filename='img/logo/footer.png') }}"
+                   alt="Footer Logo"
+                   style="height:36px;max-width:140px;object-fit:contain;"
+                   onerror="this.src='/static/img/logo/footer.png'">
+            </div>
+            <p id="previewAboutText" style="font-size:12px;color:#94a3b8;line-height:1.5;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+              {{ settings.get('footer_about') or 'AIMS Sukkur provides quality higher education and modern skill programs, equipping students for academic and professional excellence.' }}
+            </p>
+            <div style="display:flex;gap:10px;color:#94a3b8;font-size:13px;">
+              <i class="fa-brands fa-facebook-f"></i>
+              <i class="fa-brands fa-x-twitter"></i>
+              <i class="fa-brands fa-instagram"></i>
+              <i class="fa-brands fa-youtube"></i>
+              <i class="fa-brands fa-linkedin-in"></i>
+            </div>
+          </div>
+
+          <!-- Col 2: Get in Touch -->
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.5px;color:#ffffff;margin-bottom:10px;text-transform:uppercase;">GET IN TOUCH</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;color:#94a3b8;">
+              <span id="previewFooterPhone"><i class="fa fa-phone" style="width:14px;color:#60a5fa;margin-right:4px;"></i> {{ settings.get('phone') or '+92 3013456xxx' }}</span>
+              <span id="previewFooterEmail"><i class="fa fa-envelope" style="width:14px;color:#60a5fa;margin-right:4px;"></i> {{ settings.get('email') or 'contact@aimssukkur.edu.pk' }}</span>
+              <span id="previewFooterAddress"><i class="fa fa-location-dot" style="width:14px;color:#60a5fa;margin-right:4px;"></i> {{ settings.get('address') or 'Military Road, Sukkur, Sindh' }}</span>
+              <span id="previewFooterHours"><i class="fa fa-clock" style="width:14px;color:#60a5fa;margin-right:4px;"></i> {{ settings.get('working_hours') or 'Mon - Sat: 9:00 AM - 5:00 PM' }}</span>
+            </div>
+          </div>
+
+          <!-- Col 3: Useful Links -->
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.5px;color:#ffffff;margin-bottom:10px;text-transform:uppercase;">Useful Links</div>
+            <div style="font-size:11.5px;color:#94a3b8;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+              <span>› Home</span>
+              <span>› E-Library</span>
+              <span>› About Us</span>
+              <span>› Lectures</span>
+              <span>› Courses</span>
+              <span>› Events</span>
+              <span>› Faculty</span>
+              <span>› Contact</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom bar preview -->
+        <div style="background:#0a1222;padding:10px 22px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#64748b;flex-wrap:wrap;gap:8px;">
+          <span id="previewCopyrightText">{{ settings.get('copyright_text') or ('Copyright © ' ~ (settings.get('site_name') or 'AIMS Sukkur') ~ ' 2026. All rights reserved.') }}</span>
+          <span>Privacy Policy &nbsp;|&nbsp; Terms &amp; Conditions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 1: Footer Brand & About Overview -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-circle-info" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Footer Brand &amp; About Overview</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;display:flex;flex-direction:column;gap:18px;">
+      <!-- Footer Logo Row -->
+      <div class="hero-image-col">
+        <span class="hero-img-label">Footer Logo (Light or White version recommended)</span>
+        <div class="hero-img-row">
+          <div class="hero-thumb-box" style="height:80px;background:#0f1d3d;padding:6px;">
+            <img id="footerLogoPreview"
+                 src="{{ settings.get('footer_logo') or url_for('static', filename='img/logo/footer.png') }}"
+                 alt="Footer Logo"
+                 style="object-fit:contain;width:100%;height:100%;"
+                 onerror="this.src='/static/img/logo/footer.png'">
+          </div>
+          <div>
+            <label for="footerLogoInput" class="btn-change-pill">
+              <i class="fa fa-cloud-arrow-up"></i> Change Footer Logo
+            </label>
+            <input type="file" id="footerLogoInput" name="footer_logo" accept="image/png, image/jpeg, image/webp, image/svg+xml" style="display:none;" onchange="previewFooterLogo(this)">
+            <input type="hidden" name="footer_logo_path" id="footerLogoPath" value="{{ settings.get('footer_logo', '') }}">
+            <div style="font-size:11.5px;color:var(--muted);margin-top:6px;">PNG or SVG with transparent background works best on dark footers.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About Description -->
+      <div class="form-group" style="margin:0;">
+        <label for="footerAboutInput" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:block;">Footer About Description</label>
+        <textarea id="footerAboutInput" name="footer_about" rows="3"
+                  placeholder="AIMS Sukkur provides quality higher education and modern skill programs..."
+                  style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;line-height:1.5;">{{ settings.get('footer_about', '') }}</textarea>
+        <span style="font-size:11.5px;color:var(--muted);margin-top:4px;display:block;">A concise description of the institute displayed beneath the footer logo.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: "Get In Touch" Contact Info -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-address-book" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">"Get In Touch" Contact Details</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <div class="hero-text-grid">
+        <div class="form-group">
+          <label for="footerPhoneInput">Primary Contact Phone</label>
+          <input type="text" id="footerPhoneInput" name="phone"
+                 value="{{ settings.get('phone', '') }}"
+                 placeholder="+92 301 3456xxx"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="footerEmailInput">Primary Contact Email</label>
+          <input type="email" id="footerEmailInput" name="email"
+                 value="{{ settings.get('email', '') }}"
+                 placeholder="contact@aimssukkur.edu.pk"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="footerAddressInput">Campus Address</label>
+          <input type="text" id="footerAddressInput" name="address"
+                 value="{{ settings.get('address', '') }}"
+                 placeholder="Military Road, Sukkur, Sindh"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="footerHoursInput">Working Hours</label>
+          <input type="text" id="footerHoursInput" name="working_hours"
+                 value="{{ settings.get('working_hours', '') }}"
+                 placeholder="Mon - Sat: 9:00 AM - 5:00 PM"
+                 autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Social Media Profiles -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-share-nodes" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Social Media Profiles</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <div class="hero-text-grid">
+        <div class="form-group">
+          <label for="facebookInput"><i class="fa-brands fa-facebook" style="color:#1877F2;margin-right:6px;"></i> Facebook URL</label>
+          <input type="text" id="facebookInput" name="facebook"
+                 value="{{ settings.get('facebook', '') }}"
+                 placeholder="https://facebook.com/aimssukkur"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="twitterInput"><i class="fa-brands fa-x-twitter" style="color:#000000;margin-right:6px;"></i> Twitter / X URL</label>
+          <input type="text" id="twitterInput" name="twitter"
+                 value="{{ settings.get('twitter', '') }}"
+                 placeholder="https://twitter.com/aimssukkur"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="instagramInput"><i class="fa-brands fa-instagram" style="color:#E4405F;margin-right:6px;"></i> Instagram URL</label>
+          <input type="text" id="instagramInput" name="instagram"
+                 value="{{ settings.get('instagram', '') }}"
+                 placeholder="https://instagram.com/aimssukkur"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="youtubeInput"><i class="fa-brands fa-youtube" style="color:#FF0000;margin-right:6px;"></i> YouTube URL</label>
+          <input type="text" id="youtubeInput" name="youtube"
+                 value="{{ settings.get('youtube', '') }}"
+                 placeholder="https://youtube.com/@aimssukkur"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group full">
+          <label for="linkedinInput"><i class="fa-brands fa-linkedin" style="color:#0A66C2;margin-right:6px;"></i> LinkedIn URL</label>
+          <input type="text" id="linkedinInput" name="linkedin"
+                 value="{{ settings.get('linkedin', '') }}"
+                 placeholder="https://linkedin.com/school/aimssukkur"
+                 autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4: Footer Bottom & Copyright -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head" style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa fa-copyright" style="color:var(--navy);font-size:16px;"></i>
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Footer Bottom &amp; Copyright</h2>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:22px;">
+      <div class="hero-text-grid">
+        <div class="form-group full">
+          <label for="footerCopyrightInput">Copyright Notice</label>
+          <input type="text" id="footerCopyrightInput" name="copyright_text"
+                 value="{{ settings.get('copyright_text', '') }}"
+                 placeholder="Copyright © {{ settings.get('site_name') or 'AIMS Sukkur' }} 2026. All rights reserved."
+                 autocomplete="off">
+          <span style="font-size:11.5px;color:var(--muted);margin-top:4px;">Appears on the bottom left bar of every page.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="privacyUrlInput">Privacy Policy URL</label>
+          <input type="text" id="privacyUrlInput" name="privacy_url"
+                 value="{{ settings.get('privacy_url', '') }}"
+                 placeholder="/privacy-policy or #"
+                 autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="termsUrlInput">Terms &amp; Conditions URL</label>
+          <input type="text" id="termsUrlInput" name="terms_url"
+                 value="{{ settings.get('terms_url', '') }}"
+                 placeholder="/terms or #"
+                 autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Action Panel -->
+  <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:16px 20px;background:#ffffff;border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+    <a href="{{ url_for('public.index') }}" target="_blank" rel="noopener" class="btn btn-outline">Cancel / View</a>
+    <button type="submit" class="btn btn-blue" style="min-width:180px;">
+      <i class="fa fa-check"></i> Save Footer Details
+    </button>
+  </div>
+</form>
+
+<script>
+function previewFooterLogo(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      const preview = document.getElementById('footerLogoPreview');
+      const simLogo = document.getElementById('footerSimLogo');
+      if (preview) preview.src = dataUrl;
+      if (simLogo) simLogo.src = dataUrl;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// Live preview synchronization
+(function() {
+  const aboutIn = document.getElementById('footerAboutInput');
+  const phoneIn = document.getElementById('footerPhoneInput');
+  const emailIn = document.getElementById('footerEmailInput');
+  const addrIn = document.getElementById('footerAddressInput');
+  const hoursIn = document.getElementById('footerHoursInput');
+  const copyIn = document.getElementById('footerCopyrightInput');
+
+  const aboutTxt = document.getElementById('previewAboutText');
+  const phoneTxt = document.getElementById('previewFooterPhone');
+  const emailTxt = document.getElementById('previewFooterEmail');
+  const addrTxt = document.getElementById('previewFooterAddress');
+  const hoursTxt = document.getElementById('previewFooterHours');
+  const copyTxt = document.getElementById('previewCopyrightText');
+
+  if (aboutIn && aboutTxt) {
+    aboutIn.addEventListener('input', () => {
+      aboutTxt.textContent = aboutIn.value.trim() || 'AIMS Sukkur provides quality higher education and modern skill programs...';
+    });
+  }
+
+  if (phoneIn && phoneTxt) {
+    phoneIn.addEventListener('input', () => {
+      phoneTxt.innerHTML = '<i class="fa fa-phone" style="width:14px;color:#60a5fa;margin-right:4px;"></i> ' + (phoneIn.value.trim() || '+92 3013456xxx');
+    });
+  }
+
+  if (emailIn && emailTxt) {
+    emailIn.addEventListener('input', () => {
+      emailTxt.innerHTML = '<i class="fa fa-envelope" style="width:14px;color:#60a5fa;margin-right:4px;"></i> ' + (emailIn.value.trim() || 'contact@aimssukkur.edu.pk');
+    });
+  }
+
+  if (addrIn && addrTxt) {
+    addrIn.addEventListener('input', () => {
+      addrTxt.innerHTML = '<i class="fa fa-location-dot" style="width:14px;color:#60a5fa;margin-right:4px;"></i> ' + (addrIn.value.trim() || 'Military Road, Sukkur, Sindh');
+    });
+  }
+
+  if (hoursIn && hoursTxt) {
+    hoursIn.addEventListener('input', () => {
+      hoursTxt.innerHTML = '<i class="fa fa-clock" style="width:14px;color:#60a5fa;margin-right:4px;"></i> ' + (hoursIn.value.trim() || 'Mon - Sat: 9:00 AM - 5:00 PM');
+    });
+  }
+
+  if (copyIn && copyTxt) {
+    copyIn.addEventListener('input', () => {
+      copyTxt.textContent = copyIn.value.trim() || 'Copyright © AIMS Sukkur 2026. All rights reserved.';
+    });
+  }
+})();
+</script>
+{% endblock %}

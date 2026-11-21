@@ -1,0 +1,310 @@
+{% extends 'admin/base.html' %}
+{% block title %}Settings &amp; Maintenance{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+  <div class="settings-header">
+    <div class="settings-title-wrap">
+      <h2><i class="fa fa-sliders" style="color:var(--navy);margin-right:10px;"></i> Admin Settings &amp; Maintenance</h2>
+      <p class="settings-subtitle">Manage administrative password security, generate test demo content, and perform database maintenance.</p>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+    <!-- Card 1: Change Password -->
+    <div class="settings-card">
+      <div class="settings-card-head">
+        <div class="settings-card-icon navy"><i class="fa fa-key"></i></div>
+        <div>
+          <h3>Change Admin Password</h3>
+          <p>Update the password for account <strong>{{ admin.username if admin else 'admin' }}</strong></p>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <form method="post" action="{{ url_for('admin.admin_settings') }}" autocomplete="off">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="change_password">
+
+          <div class="form-group">
+            <label class="form-label" for="current_password">Current Password</label>
+            <div class="input-with-icon">
+              <i class="fa fa-lock input-icon"></i>
+              <input type="password" id="current_password" name="current_password" class="form-control" placeholder="Enter current password" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new_password">New Password</label>
+            <div class="input-with-icon">
+              <i class="fa fa-shield-halved input-icon"></i>
+              <input type="password" id="new_password" name="new_password" class="form-control" placeholder="Minimum 10 characters" minlength="10" required>
+            </div>
+            <small class="form-hint">At least 10 characters with letters and numbers.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm_password">Confirm New Password</label>
+            <div class="input-with-icon">
+              <i class="fa fa-check-double input-icon"></i>
+              <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-type new password" minlength="10" required>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-disk"></i> Update Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Card 2: Demo Data Generation -->
+    <div class="settings-card">
+      <div class="settings-card-head">
+        <div class="settings-card-icon accent"><i class="fa fa-wand-magic-sparkles"></i></div>
+        <div>
+          <h3>Complete Demo Content</h3>
+          <p>Generate courses, upcoming batches, news, e-library, events, videos &amp; faculty.</p>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <p class="settings-desc">
+          Populate the entire website with comprehensive, professional demo content:
+        </p>
+        <ul class="demo-features-list">
+          <li><i class="fa fa-check-circle"></i> <strong>4 Courses &amp; 2 Upcoming Batches</strong> with syllabus PDFs &amp; covers</li>
+          <li><i class="fa fa-check-circle"></i> <strong>4 E-Library Books &amp; 4 Latest News</strong> with attachments</li>
+          <li><i class="fa fa-check-circle"></i> <strong>4 Events &amp; 8 Learning Videos</strong> with YouTube embeds</li>
+          <li><i class="fa fa-check-circle"></i> <strong>Vision, Mission, Values &amp; Why Choose Us</strong> complete copy</li>
+          <li><i class="fa fa-check-circle"></i> <strong>Faculty Profiles</strong> with custom character photo and bios</li>
+        </ul>
+
+        <div class="form-actions" style="margin-top:20px;">
+          <button type="button" class="btn btn-outline" onclick="openDemoDataModal()">
+            <i class="fa fa-wand-magic-sparkles"></i> Generate Complete Demo Data
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-Width Maintenance Card -->
+  <div class="settings-card danger-zone-card">
+    <div class="settings-card-head">
+      <div class="settings-card-icon danger"><i class="fa fa-triangle-exclamation"></i></div>
+      <div>
+        <h3>Database &amp; Data Maintenance</h3>
+        <p>Wipe database tables or perform a complete clean reset of database and uploaded files.</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="maintenance-options-grid">
+        <!-- Option 1: Remove Database Only -->
+        <div class="maintenance-option-box">
+          <div class="mob-head">
+            <i class="fa fa-database mob-icon"></i>
+            <div>
+              <h4>Remove Database Only</h4>
+              <p>Clears database content and tables. All user-uploaded images and documents in the uploads folder are preserved intact.</p>
+            </div>
+          </div>
+          <div class="mob-note">
+            <span><i class="fa fa-info-circle"></i> Restores default admin account: <code>admin</code> / <code>AimsSukkur2026</code></span>
+          </div>
+          <button type="button" class="btn btn-danger-outline" onclick="openRemoveDbModal()">
+            <i class="fa fa-database"></i> Remove Database
+          </button>
+        </div>
+
+        <!-- Option 2: Reset All Data & Clean Uploads -->
+        <div class="maintenance-option-box reset-all-box">
+          <div class="mob-head">
+            <i class="fa fa-trash-can mob-icon danger-color"></i>
+            <div>
+              <h4>Reset All Over Data (Full Reset)</h4>
+              <p>Completely deletes all database records AND purges all files inside the uploads folder. Resets the entire site back to clean defaults.</p>
+            </div>
+          </div>
+          <div class="mob-note warning">
+            <span><i class="fa fa-triangle-exclamation"></i> Permanent action: Remember default login credentials before proceeding!</span>
+          </div>
+          <button type="button" class="btn btn-danger" onclick="openResetAllModal()">
+            <i class="fa fa-triangle-exclamation"></i> Reset All Over Data
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= Modal 1: Demo Data Confirmation ================= -->
+<div class="custom-modal-overlay" id="demoDataModal" hidden>
+  <div class="custom-modal-dialog">
+    <div class="custom-modal-head">
+      <div class="custom-modal-icon primary"><i class="fa fa-wand-magic-sparkles"></i></div>
+      <div>
+        <h4>Generate Complete Demo Data</h4>
+        <p>Populate courses, library, events, videos, about &amp; faculty</p>
+      </div>
+      <button type="button" class="custom-modal-close" onclick="closeDemoDataModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="custom-modal-body">
+      <p style="margin-bottom:14px;font-size:14px;color:var(--text);line-height:1.5;">
+        This will create complete demo content across all sections of the website including courses, upcoming batches, e-library books, events, learning videos, vision/mission/values, why choose us, and faculty data with sample PDFs and posters.
+      </p>
+      <div class="info-pills-row">
+        <span class="info-pill"><i class="fa fa-graduation-cap"></i> Courses</span>
+        <span class="info-pill"><i class="fa fa-calendar-plus"></i> Upcoming</span>
+        <span class="info-pill"><i class="fa fa-newspaper"></i> News</span>
+        <span class="info-pill"><i class="fa fa-book"></i> E-Library</span>
+        <span class="info-pill"><i class="fa fa-calendar-days"></i> Events</span>
+        <span class="info-pill"><i class="fa fa-video"></i> Videos</span>
+        <span class="info-pill"><i class="fa fa-eye"></i> Vision &amp; Mission</span>
+        <span class="info-pill"><i class="fa fa-user-tie"></i> Teachers</span>
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeDemoDataModal()">Cancel</button>
+      <form method="post" action="{{ url_for('admin.admin_settings') }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="create_demo_data">
+        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Yes, Generate Demo Data</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================= Modal 2: Remove Database Only ================= -->
+<div class="custom-modal-overlay" id="removeDbModal" hidden>
+  <div class="custom-modal-dialog">
+    <div class="custom-modal-head">
+      <div class="custom-modal-icon danger"><i class="fa fa-database"></i></div>
+      <div>
+        <h4>Remove Database Only</h4>
+        <p>Wipe all database records (uploads folder will be kept)</p>
+      </div>
+      <button type="button" class="custom-modal-close" onclick="closeRemoveDbModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="custom-modal-body">
+      <div class="credentials-overlay-box">
+        <div class="cob-title"><i class="fa fa-shield-halved"></i> Default Login Credentials Restored</div>
+        <p class="cob-sub">After wiping the database, default admin credentials will be restored:</p>
+        <div class="cob-grid">
+          <div class="cob-row">
+            <span class="cob-label">Username:</span>
+            <code class="cob-value" id="remDbUser">admin</code>
+            <button type="button" class="cob-copy-btn" onclick="copyCred('remDbUser', this)" title="Copy username"><i class="fa fa-copy"></i></button>
+          </div>
+          <div class="cob-row">
+            <span class="cob-label">Password:</span>
+            <code class="cob-value" id="remDbPass">AimsSukkur2026</code>
+            <button type="button" class="cob-copy-btn" onclick="copyCred('remDbPass', this)" title="Copy password"><i class="fa fa-copy"></i></button>
+          </div>
+        </div>
+        <small class="cob-hint"><i class="fa fa-circle-check"></i> Uploaded media and PDFs will remain safe in the uploads folder.</small>
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeRemoveDbModal()">Cancel</button>
+      <form method="post" action="{{ url_for('admin.admin_settings') }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="remove_db">
+        <button type="submit" class="btn btn-danger"><i class="fa fa-database"></i> Wipe Database</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================= Modal 3: Reset All Data & Uploads ================= -->
+<div class="custom-modal-overlay" id="resetAllModal" hidden>
+  <div class="custom-modal-dialog">
+    <div class="custom-modal-head">
+      <div class="custom-modal-icon danger"><i class="fa fa-triangle-exclamation"></i></div>
+      <div>
+        <h4>Factory Reset: All Data &amp; Uploads</h4>
+        <p>Permanent wipe of database and uploaded files</p>
+      </div>
+      <button type="button" class="custom-modal-close" onclick="closeResetAllModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="custom-modal-body">
+      <div class="credentials-overlay-box highlight-danger">
+        <div class="cob-title"><i class="fa fa-bell"></i> REMEMBER LOGIN CREDENTIALS</div>
+        <p class="cob-sub">You will be logged out immediately after the reset. Use these default credentials to log in:</p>
+        <div class="cob-grid">
+          <div class="cob-row">
+            <span class="cob-label">Username:</span>
+            <code class="cob-value" id="resetUser">admin</code>
+            <button type="button" class="cob-copy-btn" onclick="copyCred('resetUser', this)" title="Copy username"><i class="fa fa-copy"></i></button>
+          </div>
+          <div class="cob-row">
+            <span class="cob-label">Password:</span>
+            <code class="cob-value" id="resetPass">AimsSukkur2026</code>
+            <button type="button" class="cob-copy-btn" onclick="copyCred('resetPass', this)" title="Copy password"><i class="fa fa-copy"></i></button>
+          </div>
+        </div>
+        <div class="cob-warning-note">
+          <i class="fa fa-triangle-exclamation"></i>
+          <span><strong>Notice:</strong> All courses, faculty, messages, news, and all uploaded images/PDFs will be permanently removed.</span>
+        </div>
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeResetAllModal()">Cancel</button>
+      <form method="post" action="{{ url_for('admin.admin_settings') }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="reset_all">
+        <button type="submit" class="btn btn-danger"><i class="fa fa-trash-can"></i> Yes, Reset All Over Data</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openDemoDataModal() {
+  var el = document.getElementById('demoDataModal');
+  if (el) el.hidden = false;
+}
+function closeDemoDataModal() {
+  var el = document.getElementById('demoDataModal');
+  if (el) el.hidden = true;
+}
+
+function openRemoveDbModal() {
+  var el = document.getElementById('removeDbModal');
+  if (el) el.hidden = false;
+}
+function closeRemoveDbModal() {
+  var el = document.getElementById('removeDbModal');
+  if (el) el.hidden = true;
+}
+
+function openResetAllModal() {
+  var el = document.getElementById('resetAllModal');
+  if (el) el.hidden = false;
+}
+function closeResetAllModal() {
+  var el = document.getElementById('resetAllModal');
+  if (el) el.hidden = true;
+}
+
+function copyCred(elementId, btn) {
+  var text = document.getElementById(elementId).innerText.trim();
+  navigator.clipboard.writeText(text).then(function() {
+    var orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa fa-check" style="color:#10b981;"></i>';
+    setTimeout(function(){ btn.innerHTML = orig; }, 1800);
+  });
+}
+
+// Close modals when clicking background overlay
+document.querySelectorAll('.custom-modal-overlay').forEach(function(overlay){
+  overlay.addEventListener('click', function(e){
+    if (e.target === overlay) {
+      overlay.hidden = true;
+    }
+  });
+});
+</script>
+{% endblock %}

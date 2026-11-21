@@ -1,0 +1,288 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>About Us - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/pages/faculty-7.css') }}?v=3.0">
+</head>
+
+<body>
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <div class="as-mainwrapper">
+        <div class="bg-white">
+
+            {% include 'includes/header.html' %}
+
+            <div class="page-banner-area"
+                style="background-image:url({{ url_for('static', filename='img/banner/logo101.png') }});">
+                <div class="container">
+                    <div class="page-banner-content">
+                        <h1>About Us</h1>
+                        <ul class="page-breadcrumb">
+                            <li><a href="{{ url_for('public.index') }}">Home</a></li>
+                            <li>About Us</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mission & Vision first (from admin /admin/about) -->
+            <div class="section-padding reveal-on-scroll">
+                <div class="container">
+                    <div class="row mvv-row">
+                        {% set mvv_keys = ['mission', 'vision', 'values'] %}
+                        {% for key in mvv_keys %}
+                        {% set b = blocks.get(key) if blocks is defined else none %}
+                        {% if b %}
+                        <div class="col-lg-4 col-md-4 col-6 mvv-col{% if key == 'values' %} d-none d-md-block{% endif %}">
+                            <div class="mvv-card">
+                                <div class="mvv-icon"><i class="zmdi {{ b.icon or 'zmdi-flag' }}"></i></div>
+                                <h4>{{ b.title or key|capitalize }}</h4>
+                                <p>{{ b.content or '' }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- About hero (title/text/image from admin blocks) -->
+            <div class="about-hero-area reveal-on-scroll">
+                <div class="about-hero-bg" style="background-image: linear-gradient(135deg, rgba(31, 57, 113, 0.78) 0%, rgba(42, 74, 138, 0.72) 50%, rgba(31, 57, 113, 0.82) 100%), url('{{ url_for('static', filename='img/banner/back.jpg') }}');"></div>
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-md-12">
+                            <div class="about-hero-content">
+                                <h2 class="about-hero-title">
+                                    {% if blocks is defined and blocks.get('hero_title') and blocks.get('hero_title').title %}
+                                        {{ blocks.get('hero_title').title }}
+                                    {% else %}
+                                        Who We Are at AIMS Sukkur
+                                    {% endif %}
+                                </h2>
+                                <p class="about-hero-text">
+                                    {% if blocks is defined and blocks.get('hero_text') and blocks.get('hero_text').content %}
+                                        {{ blocks.get('hero_text').content }}
+                                    {% elif blocks is defined and blocks.get('hero_title') and blocks.get('hero_title').content %}
+                                        {{ blocks.get('hero_title').content }}
+                                    {% else %}
+                                        AIMS Sukkur is committed to quality teaching, practical skills, and student growth.
+                                        We combine strong academics with modern facilities so every learner can build a
+                                        confident future.
+                                    {% endif %}
+                                </p>
+                                <a href="{{ url_for('public.courses', _anchor='upcoming-courses') }}" class="about-hero-btn">Explore Our Courses</a>
+                                <div class="about-hero-stats">
+                                    {% if fun_factors %}
+                                        {% for ff in fun_factors[:3] %}
+                                        <div class="about-stat-item">
+                                            <div class="about-stat-icon">
+                                                <i class="zmdi {% if loop.index == 1 %}zmdi-graduation-cap{% elif loop.index == 2 %}zmdi-accounts{% else %}zmdi-library{% endif %}"></i>
+                                            </div>
+                                            <div>
+                                                <h4>{{ ff.number }}{% if '+' not in ff.number|string %}+{% endif %}</h4>
+                                                <span>{{ ff.label }}</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="about-stat-item">
+                                            <div class="about-stat-icon"><i class="zmdi zmdi-graduation-cap"></i></div>
+                                            <div><h4>1200+</h4><span>Students</span></div>
+                                        </div>
+                                        <div class="about-stat-item">
+                                            <div class="about-stat-icon"><i class="zmdi zmdi-accounts"></i></div>
+                                            <div><h4>79+</h4><span>Teachers</span></div>
+                                        </div>
+                                        <div class="about-stat-item">
+                                            <div class="about-stat-icon"><i class="zmdi zmdi-library"></i></div>
+                                            <div><h4>36+</h4><span>Courses</span></div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <div class="about-hero-image">
+                                {% set himg = none %}
+                                {% if blocks is defined %}
+                                    {% set himg = blocks.get('hero_image') or blocks.get('hero_title') %}
+                                {% endif %}
+                                <img src="{{ himg.image if himg and himg.image else url_for('static', filename='img/about/yasir1.png') }}"
+                                     alt="AIMS Sukkur" loading="lazy" decoding="async">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Choose Us (from admin /admin/why-choose) -->
+            <div class="section-padding reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title-wrapper">
+                                <div class="section-title">
+                                    <h3>WHY CHOOSE US</h3>
+                                    <p>What makes AIMS Sukkur different from others</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row why-choose-grid">
+                        {% if why_choose %}
+                        {% for w in why_choose %}
+                        <div class="col-lg-3 col-md-6 col-6">
+                            <div class="why-choose-card">
+                                <div class="wc-icon"><i class="zmdi {{ w.icon or 'zmdi-accounts' }}"></i></div>
+                                <h4>{{ w.title }}</h4>
+                                <p>{{ w.content or '' }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-12 text-center">
+                            <p>No items yet.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meet Our Team – slider (from admin /admin/team) -->
+            <div class="teachers-area section-padding bg-white reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title-wrapper">
+                                <div class="section-title">
+                                    <h3>MEET OUR TEAM</h3>
+                                    <p>Experienced educators dedicated to your success</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-slider-wrap">
+                        <div class="team-card-slider owl-carousel">
+                            {% if team_members %}
+                            {% for m in team_members %}
+                            <div class="team-slide">
+                                <div class="fac-card">
+                                    <!-- Top-left navy curved corner accent -->
+                                    <svg class="fac-corner-accent" viewBox="0 0 100 100" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                                        <path d="M0 0 H100 C60 0 0 60 0 100 Z" fill="#1E3A6D"/>
+                                    </svg>
+
+                                    <!-- Main top row: Avatar + Info (Full Width for Name) -->
+                                    <div class="fac-main-row">
+                                        <a href="{{ url_for('public.faculty_detail', member_id=m.id) }}" class="fac-avatar-wrap" title="View {{ m.name }}'s Profile">
+                                            <img src="{{ m.image or url_for('static', filename='img/teacher/1.png') }}"
+                                                 alt="{{ m.name }}"
+                                                 class="fac-avatar-img"
+                                                 onerror="this.src='{{ url_for('static', filename='img/teacher/1.png') }}'" loading="lazy" decoding="async">
+                                        </a>
+                                        <div class="fac-info">
+                                            <h4 class="fac-name">
+                                                <a href="{{ url_for('public.faculty_detail', member_id=m.id) }}">{{ m.name }}</a>
+                                            </h4>
+                                            <div class="fac-role-pill">{{ m.role or 'Faculty' }}</div>
+                                            <div class="fac-line"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bottom row: Qualification on left, Social Icons safely on right -->
+                                    <div class="fac-bottom-row">
+                                        <div class="fac-edu-wrap">
+                                            <i class="fa fa-graduation-cap fac-edu-icon"></i>
+                                            <span class="fac-edu-text">{{ m.qualification or 'Faculty Member, AIMS Sukkur' }}</span>
+                                        </div>
+                                        <div class="fac-socials">
+                                            {% if m.linkedin %}
+                                            <a href="{{ m.linkedin|safe_url }}" target="_blank" rel="noopener noreferrer" class="fac-social-btn" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
+                                            {% else %}
+                                            <a href="{{ url_for('public.faculty_detail', member_id=m.id) }}" class="fac-social-btn" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
+                                            {% endif %}
+                                            {% if m.twitter %}
+                                            <a href="{{ m.twitter|safe_url }}" target="_blank" rel="noopener noreferrer" class="fac-social-btn" title="Twitter"><i class="fa fa-twitter"></i></a>
+                                            {% elif m.facebook %}
+                                            <a href="{{ m.facebook|safe_url }}" target="_blank" rel="noopener noreferrer" class="fac-social-btn" title="Facebook"><i class="fa fa-facebook"></i></a>
+                                            {% else %}
+                                            <a href="{{ url_for('public.faculty_detail', member_id=m.id) }}" class="fac-social-btn" title="Profile"><i class="fa fa-globe"></i></a>
+                                            {% endif %}
+                                            {% if m.email %}
+                                            <a href="mailto:{{ m.email }}" class="fac-social-btn" title="Email"><i class="fa fa-envelope"></i></a>
+                                            {% else %}
+                                            <a href="{{ url_for('public.faculty_detail', member_id=m.id) }}" class="fac-social-btn" title="Email"><i class="fa fa-envelope"></i></a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-center mt-30">
+                            <a href="{{ url_for('public.faculty') }}" class="button-default button-large team-faculty-btn">
+                                View Full Faculty <i class="zmdi zmdi-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+    {% include 'includes/scripts.html' %}
+
+    <script>
+        jQuery(function ($) {
+            var $team = $('.team-card-slider');
+            if (!$team.length) return;
+            if ($team.hasClass('owl-loaded')) {
+                $team.trigger('destroy.owl.carousel');
+                $team.removeClass('owl-loaded owl-hidden');
+                $team.find('.owl-stage-outer').children().unwrap();
+            }
+            $team.owlCarousel({
+                loop: true,
+                margin: 24,
+                nav: false,
+                dots: true,
+                autoplay: true,
+                autoplayTimeout: 4000,
+                autoplayHoverPause: true,
+                smartSpeed: 500,
+                responsive: {
+                    0: { items: 1, margin: 12 },
+                    768: { items: 2, margin: 18 },
+                    992: { items: 3, margin: 24 }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

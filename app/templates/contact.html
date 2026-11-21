@@ -1,0 +1,149 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Contact Us - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/pages/contact-1.css') }}">
+
+<style>.form-messege.success{color:#15803d}.form-messege.error{color:#b91c1c}</style>
+</head>
+
+<body>
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <div class="as-mainwrapper">
+        <div class="bg-white">
+
+            {% include 'includes/header.html' %}
+
+            <!-- Unified Page Banner (Matching About, Courses, Events & E-Library) -->
+            <div class="page-banner-area"
+                style="background-image:url({{ url_for('static', filename='img/banner/logo101.png') }});">
+                <div class="container">
+                    <div class="page-banner-content">
+                        <h1>Contact Us</h1>
+                        <ul class="page-breadcrumb">
+                            <li><a href="{{ url_for('public.index') }}">Home</a></li>
+                            <li>Contact Us</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-page-wrap">
+                <div class="container">
+
+                    <!-- Flash messages from form submissions -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="contact-alerts-wrap">
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} contact-alert">
+                            <i class="fa fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+
+                    
+
+                    <!-- 2. Contact Form (Centered, Streamlined) -->
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 col-md-10 col-12">
+                            <div class="contact-form-card">
+                                <div class="form-card-header">
+                                    <h2 class="form-card-title">Send a Message</h2>
+                                </div>
+
+                                <form id="contact-form" action="{{ url_for('public.contact') }}" method="post" class="custom-contact-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="form-messege" role="status" aria-live="polite" style="margin-bottom:14px;font-weight:600;"></div>
+                                    <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-20">
+                                            <label class="field-label">Name <span class="req">*</span></label>
+                                            <div class="input-with-icon">
+                                                <i class="zmdi zmdi-account"></i>
+                                                <input type="text" name="name" class="form-field-input" placeholder="Your Name" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-20">
+                                            <label class="field-label">Email <span class="req">*</span></label>
+                                            <div class="input-with-icon">
+                                                <i class="zmdi zmdi-email"></i>
+                                                <input type="email" name="email" class="form-field-input" placeholder="Your Email" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-20">
+                                            <label class="field-label">Phone</label>
+                                            <div class="input-with-icon">
+                                                <i class="zmdi zmdi-phone"></i>
+                                                <input type="tel" name="phone" class="form-field-input" placeholder="Phone Number">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-20">
+                                            <label class="field-label">Subject</label>
+                                            <div class="input-with-icon select-wrap">
+                                                <i class="zmdi zmdi-info-outline"></i>
+                                                <select name="subject" class="form-field-input">
+                                                    <option value="Admissions Inquiry">Admissions Inquiry</option>
+                                                    <option value="Course Information">Course Information</option>
+                                                    <option value="General Query" selected>General Query</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mb-20">
+                                            <label class="field-label">Message <span class="req">*</span></label>
+                                            <div class="input-with-icon textarea-wrap">
+                                                <i class="zmdi zmdi-comment-edit"></i>
+                                                <textarea name="message" class="form-field-input form-field-textarea" rows="4" placeholder="Your Message..." required></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 text-center">
+                                            <button type="submit" class="contact-submit-btn">
+                                                <span>Send Message</span>
+                                                <i class="fa fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+    {% include 'includes/scripts.html' %}
+</body>
+
+</html>

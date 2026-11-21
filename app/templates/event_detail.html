@@ -1,0 +1,123 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{{ item.title }} - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/pages/event_detail-4.css') }}">
+</head>
+<body>
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
+    </div>
+    <div class="as-mainwrapper">
+        <div class="bg-white">
+            {% include 'includes/header.html' %}
+
+            <div class="course-detail-wrap">
+                <div class="course-detail-container">
+                    <div class="course-detail-layout">
+                        <!-- Main Content -->
+                        <div class="course-detail-main">
+                            <div class="detail-section-card">
+                                <!-- 1. Event TITLE -->
+                                <div class="book-title-block">
+                                    <h1 class="book-title">{{ item.title }}</h1>
+                                </div>
+
+                                <!-- 2. Event Info Strip -->
+                                <div class="event-info-strip">
+                                    {% if item.date %}
+                                    <div class="info-pill"><i class="zmdi zmdi-calendar-check"></i> <span><strong>Date:</strong> {{ item.date }}</span></div>
+                                    {% endif %}
+                                    {% if item.time %}
+                                    <div class="info-pill"><i class="zmdi zmdi-time"></i> <span><strong>Time:</strong> {{ item.time }}</span></div>
+                                    {% endif %}
+                                    {% if item.location %}
+                                    <div class="info-pill"><i class="zmdi zmdi-pin"></i> <span><strong>Venue:</strong> {{ item.location }}</span></div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- 3. Event Poster / Image -->
+                                {% if item.image %}
+                                <div class="event-poster-wrap">
+                                    <img class="event-poster-img" src="{{ item.image }}" alt="{{ item.title }}" loading="lazy" decoding="async">
+                                </div>
+                                {% endif %}
+
+                                <!-- 4. Registration / Form CTA Card (Just like Apply Now in upcoming course) -->
+                                <div class="apply-cta-box">
+                                    <div class="apply-cta-text">
+                                        <h3><i class="fa fa-wpforms" style="color:#FFAE27;margin-right:8px;"></i> Event Registration</h3>
+                                        <p>Register online to reserve your seat and participate in this upcoming event at AIMS Sukkur.</p>
+                                    </div>
+                                    {% if item.form_link %}
+                                    <a href="{{ item.form_link|safe_url }}" target="_blank" rel="noopener noreferrer" class="upcoming-apply-btn-big">
+                                        <i class="fa fa-pencil-square-o"></i> Register / Fill Form <i class="fa fa-external-link"></i>
+                                    </a>
+                                    {% else %}
+                                    <a href="{{ url_for('public.contact') }}" class="upcoming-apply-btn-big">
+                                        <i class="fa fa-envelope"></i> Inquire to Attend
+                                    </a>
+                                    {% endif %}
+                                </div>
+
+                                <!-- 5. Event Details & Description -->
+                                <div class="author-desc-block">
+                                    <h3 class="author-section-heading">Event Details &amp; Overview</h3>
+                                    <div class="course-description-content">{{ item.content or 'No additional details provided for this event.' }}</div>
+
+                                    <div>
+                                        <a href="{{ url_for('public.events') }}" class="course-back-btn">
+                                            <i class="zmdi zmdi-chevron-left"></i> Back to Events
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Side: Other events — matching course & book cards design -->
+                        <div class="course-detail-side">
+                            <span class="side-div-title">Other Events</span>
+                            {% if related %}
+                                {% for e in related[:20] %}
+                                <div class="side-course-card">
+                                    <div class="side-course-thumb-wrap">
+                                        <a href="{{ url_for('public.event_detail', event_id=e.id) }}">
+                                            <img class="side-course-thumb" src="{{ e.image or url_for('static', filename='img/event/1.jpg') }}" alt="{{ e.title }}" loading="lazy" decoding="async">
+                                        </a>
+                                    </div>
+                                    <div class="side-course-body">
+                                        <a href="{{ url_for('public.event_detail', event_id=e.id) }}" class="side-course-title">{{ e.title }}</a>
+                                        <a href="{{ url_for('public.event_detail', event_id=e.id) }}" class="side-course-btn">View Event</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="side-course-card">
+                                    <div class="side-course-body text-center">
+                                        <p style="font-size:11px;color:#6b7280;margin:0;">No other events</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+    {% include 'includes/scripts.html' %}
+</body>
+</html>

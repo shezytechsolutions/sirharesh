@@ -1,0 +1,123 @@
+<footer>
+    <!-- Footer Widget Area -->
+    <div class="footer-widget-area reveal-on-scroll">
+        <div class="container">
+            <div class="row footer-widget-row">
+                <!-- Column 1: Institute About & Branding -->
+                <div class="col-lg-4 col-md-6 col-12">
+                    <div class="single-footer-widget">
+                        <div class="footer-logo">
+                            <a href="{{ url_for('public.index') }}">
+                                <img src="{{ settings.get('footer_logo') or url_for('static', filename='img/logo/footer.png') }}" alt="{{ settings.get('site_name') or 'AIMS Sukkur' }}" height="60px" width="200" onerror="this.src='{{ url_for('static', filename='img/logo/footer.png') }}'">
+                            </a>
+                        </div>
+                        <p>{{ settings.get('footer_about') or 'AIMS Sukkur provides quality higher education and modern skill programs, equipping students for academic and professional excellence.' }}</p>
+                        <div class="social-icons">
+                            {% if settings.get('facebook') and settings.get('facebook') != '#' %}
+                            <a href="{{ settings.get('facebook')|safe_url }}" target="_blank" rel="noopener" title="Facebook"><i class="zmdi zmdi-facebook"></i></a>
+                            {% else %}
+                            <a href="#" title="Facebook"><i class="zmdi zmdi-facebook"></i></a>
+                            {% endif %}
+
+                            {% if settings.get('twitter') and settings.get('twitter') != '#' %}
+                            <a href="{{ settings.get('twitter')|safe_url }}" target="_blank" rel="noopener" title="Twitter / X"><i class="zmdi zmdi-twitter"></i></a>
+                            {% else %}
+                            <a href="#" title="Twitter / X"><i class="zmdi zmdi-twitter"></i></a>
+                            {% endif %}
+
+                            {% if settings.get('instagram') and settings.get('instagram') != '#' %}
+                            <a href="{{ settings.get('instagram')|safe_url }}" target="_blank" rel="noopener" title="Instagram"><i class="zmdi zmdi-instagram"></i></a>
+                            {% else %}
+                            <a href="#" title="Instagram"><i class="zmdi zmdi-instagram"></i></a>
+                            {% endif %}
+
+                            {% if settings.get('youtube') and settings.get('youtube') != '#' %}
+                            <a href="{{ settings.get('youtube')|safe_url }}" target="_blank" rel="noopener" title="YouTube"><i class="zmdi zmdi-youtube-play"></i></a>
+                            {% else %}
+                            <a href="#" title="YouTube"><i class="zmdi zmdi-youtube-play"></i></a>
+                            {% endif %}
+
+                            {% if settings.get('linkedin') and settings.get('linkedin') != '#' %}
+                            <a href="{{ settings.get('linkedin')|safe_url }}" target="_blank" rel="noopener" title="LinkedIn"><i class="zmdi zmdi-linkedin"></i></a>
+                            {% else %}
+                            <a href="#" title="LinkedIn"><i class="zmdi zmdi-linkedin"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Get in Touch -->
+                <div class="col-lg-4 col-md-6 col-12">
+                    <div class="single-footer-widget footer-contact-widget">
+                        <h3>GET IN TOUCH</h3>
+                        <a href="tel:{{ (settings.phone or '+92 3013456xxx')|replace(' ', '') }}">
+                            <i class="fa fa-phone"></i>
+                            <span>{{ settings.phone or '+92 3013456xxx' }}</span>
+                        </a>
+                        <a href="mailto:{{ settings.email or 'contact@aimssukkur.edu.pk' }}">
+                            <i class="fa fa-envelope"></i>
+                            <span>{{ settings.email or 'contact@aimssukkur.edu.pk' }}</span>
+                        </a>
+                        <span>
+                            <i class="fa fa-map-marker"></i>
+                            <span>{{ settings.address or 'Military Road, Sukkur, Sindh' }}</span>
+                        </span>
+                        {% if settings.working_hours %}
+                        <span>
+                            <i class="fa fa-clock-o"></i>
+                            <span>{{ settings.working_hours }}</span>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Column 3: Useful Links -->
+                <div class="col-lg-4 col-md-12 col-12">
+                    <div class="single-footer-widget">
+                        <h3>Useful Links</h3>
+                        <div class="row">
+                            <div class="col-6">
+                                <ul class="footer-list">
+                                    <li><a href="{{ url_for('public.index') }}"><i class="fa fa-angle-right"></i> Home</a></li>
+                                    <li><a href="{{ url_for('public.about') }}"><i class="fa fa-angle-right"></i> About Us</a></li>
+                                    <li><a href="{{ url_for('public.courses') }}"><i class="fa fa-angle-right"></i> Our Courses</a></li>
+                                    <li><a href="{{ url_for('public.faculty') }}"><i class="fa fa-angle-right"></i> Teachers &amp; Staff</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-6">
+                                <ul class="footer-list">
+                                    <li><a href="{{ url_for('public.elibrary') }}"><i class="fa fa-angle-right"></i> E-Library</a></li>
+                                    <li><a href="{{ url_for('public.learning_videos') }}"><i class="fa fa-angle-right"></i> Video Lectures</a></li>
+                                    <li><a href="{{ url_for('public.events') }}"><i class="fa fa-angle-right"></i> Events</a></li>
+                                    <li><a href="{{ url_for('public.contact') }}"><i class="fa fa-angle-right"></i> Contact Us</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Bottom Area -->
+    <div class="footer-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-7 col-12">
+                    <span>{{ settings.get('copyright_text') or ('Copyright &copy; ' ~ (settings.get('site_name') or 'AIMS Sukkur') ~ ' 2026. All rights reserved.') }}</span>
+                </div>
+                <div class="col-lg-6 col-md-5 col-12">
+                    <div class="column-right">
+                        <span>
+    <a >Built by</a>
+    &nbsp;|&nbsp;
+    <a href="https://shezytechsolutions.github.io/sts.co"
+       target="_blank"
+       rel="noopener noreferrer">Shezy Tech Solutions</a>
+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

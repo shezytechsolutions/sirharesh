@@ -1,0 +1,90 @@
+/* Edit-page overlay styles — extracted from templates/admin/edit_page.html */
+<style>
+    .sec-list { display: grid; gap: 10px; }
+    .sec-item {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        padding: 16px 18px; background: #fff; border: 1px solid #e8ecf1; border-radius: 10px;
+        cursor: pointer; transition: box-shadow .2s, border-color .2s;
+    }
+    .sec-item:hover { border-color: #FFAE27; box-shadow: 0 4px 16px rgba(15,30,50,.08); }
+    .sec-item .left { display: flex; align-items: center; gap: 14px; }
+    .sec-item .num {
+        width: 36px; height: 36px; border-radius: 8px; background: var(--navy, #1E3A6D); color: #fff;
+        display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
+    }
+    .sec-item .title { font-weight: 600; font-size: 15px; color: #1a1a2e; }
+    .sec-item .meta { font-size: 12px; color: #888; margin-top: 2px; }
+    .sec-item .badge-live { background: #d4edda; color: #155724; }
+    .sec-item .badge-soon { background: #f0f0f0; color: #888; }
+    .sec-item .open-btn {
+        padding: 8px 14px; border-radius: 6px; border: none; background: var(--navy, #1E3A6D); color: #fff;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .sec-item.disabled { opacity: .65; cursor: default; }
+    .sec-item.disabled:hover { border-color: #e8ecf1; box-shadow: none; }
+    .sec-item.disabled .open-btn { background: #bbb; cursor: not-allowed; }
+
+    /* Overlay */
+    .ov-backdrop {
+        display: none; position: fixed; inset: 0; background: rgba(15,20,35,.55);
+        z-index: 2000; backdrop-filter: blur(2px);
+    }
+    .ov-backdrop.open { display: block; }
+    .ov-panel {
+        display: none; position: fixed; top: 0; right: 0; width: min(640px, 100%);
+        height: 100%; background: #f4f6f9; z-index: 2010;
+        box-shadow: -12px 0 40px rgba(0,0,0,.2);
+        overflow-y: auto; transform: translateX(100%); transition: transform .3s ease;
+    }
+    .ov-panel.open { display: block; transform: translateX(0); }
+    .ov-head {
+        position: sticky; top: 0; z-index: 5; background: var(--navy, #1E3A6D); color: #fff;
+        padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .ov-head h2 { margin: 0; font-size: 17px; font-weight: 700; }
+    .ov-close {
+        width: 36px; height: 36px; border: none; border-radius: 50%; background: rgba(255,255,255,.12);
+        color: #fff; font-size: 22px; cursor: pointer; line-height: 1;
+    }
+    .ov-close:hover { background: rgba(255,255,255,.22); }
+    .ov-body { padding: 18px; }
+    .ov-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .ov-tab {
+        padding: 8px 14px; border-radius: 20px; border: 1px solid #ddd; background: #fff;
+        font-size: 13px; font-weight: 600; cursor: pointer; color: #444;
+    }
+    .ov-tab.active { background: #FFAE27; border-color: #FFAE27; color: #1a1a2e; }
+    .ov-pane { display: none; }
+    .ov-pane.active { display: block; }
+    .slide-row {
+        display: flex; gap: 12px; align-items: center; padding: 12px; background: #fff;
+        border: 1px solid #eef1f5; border-radius: 8px; margin-bottom: 8px; cursor: pointer;
+    }
+    .slide-row:hover { border-color: #FFAE27; }
+    .slide-row img { width: 72px; height: 42px; object-fit: cover; border-radius: 4px; }
+    .slide-row .info { flex: 1; min-width: 0; }
+    .slide-row .info strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .slide-row .info span { font-size: 11px; color: #888; }
+
+    /* YouTube-style positioner */
+    .yt-frame {
+        position: relative; width: 100%; background: #111; border-radius: 8px; overflow: hidden;
+        border: 1px solid #333; user-select: none; touch-action: none; cursor: grab;
+    }
+    .yt-frame:active { cursor: grabbing; }
+    .yt-frame.desktop { aspect-ratio: 21 / 9; max-height: 200px; }
+    .yt-frame.mobile { aspect-ratio: 16 / 9; width: 180px; max-height: 110px; }
+    .yt-frame .yt-img {
+        position: absolute; inset: -30%; width: 160%; height: 160%;
+        background-size: cover; background-repeat: no-repeat;
+        pointer-events: none;
+    }
+    .yt-frame .yt-hint {
+        position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+        background: rgba(0,0,0,.65); color: #fff; font-size: 11px; padding: 4px 10px;
+        border-radius: 12px; pointer-events: none; white-space: nowrap;
+    }
+    .edit-block {
+        background: #fff; border: 1px solid #eef1f5; border-radius: 10px; padding: 16px; margin-bottom: 14px;
+    }
+    .edit-block h4 { margin: 0 0 12px; font-size: 14px; }

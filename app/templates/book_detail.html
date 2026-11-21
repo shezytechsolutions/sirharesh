@@ -1,0 +1,133 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{{ item.title }} - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/pages/book_detail-6.css') }}">
+</head>
+<body>
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
+    </div>
+    <div class="as-mainwrapper">
+        <div class="bg-white">
+            {% include 'includes/header.html' %}
+
+            <div class="course-detail-wrap">
+                <div class="course-detail-container">
+                    <div class="course-detail-layout">
+                        <!-- Main Content -->
+                        <div class="course-detail-main">
+                            <div class="detail-section-card">
+                                <!-- 1. Book TITLE -->
+                                <div class="book-title-block">
+                                    <h1 class="book-title">{{ item.title }}</h1>
+                                </div>
+
+                                <!-- 2. PDF viewer (Mac-style window topper, iframe, toolbar footer) -->
+                                {% if item.pdf %}
+                                <div class="pdf-window-container">
+                                    <div class="pdf-window-topper">
+                                        <div class="pdf-circle-container">
+                                            <span class="pdf-circle dot-red"></span>
+                                            <span class="pdf-circle dot-yellow"></span>
+                                            <span class="pdf-circle dot-green"></span>
+                                        </div>
+                                        <div class="pdf-topper-title">
+                                            <i class="fa fa-file-pdf"></i>
+                                            <span>{{ item.title }} - E-Reader / PDF</span>
+                                        </div>
+                                        <span class="pdf-badge-status"><i class="fa fa-circle"></i> PDF Viewer</span>
+                                    </div>
+                                    <div class="pdf-frame-wrap">
+                                        <iframe src="{{ pdf_url or item.pdf }}"
+                                                title="{{ item.title }} - Book PDF">
+                                        </iframe>
+                                    </div>
+                                    <div class="pdf-window-footer">
+                                        <span class="pdf-footer-hint"><i class="zmdi zmdi-info"></i> Use the toolbar inside the viewer to zoom, search, print or navigate pages.</span>
+                                        <a href="{{ pdf_download_url or item.pdf }}" download class="pdf-download-btn">
+                                            <i class="fa fa-download"></i> Download PDF
+                                        </a>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="pdf-placeholder">
+                                    <i class="zmdi zmdi-file-text"></i>
+                                    <h4>Digital Edition &amp; Reading Document</h4>
+                                    <p>The digital PDF edition of this book will be uploaded soon. You may contact our library desk for physical copy queries.</p>
+                                    <a href="{{ url_for('public.contact') }}" class="pdf-action-btn">Inquire at Library Desk</a>
+                                </div>
+                                {% endif %}
+
+                                <!-- 3. Author & description -->
+                                <div class="author-desc-block">
+                                    <h3 class="author-section-heading">Book Details &amp; Summary</h3>
+                                    <div class="instructor-strip">
+                                        <img src="{{ item.image or url_for('static', filename='img/product/16.jpg') }}" alt="{{ item.title }}" loading="lazy" decoding="async">
+                                        <div>
+                                            <strong>{{ item.author or 'AIMS Sukkur E-Library' }}</strong>
+                                            <span>
+                                                {% if item.pages %}<i class="zmdi zmdi-file-text"></i> {{ item.pages }}{% else %}AIMS Sukkur Digital Collection{% endif %}
+                                                {% if item.badge and item.badge|lower != 'available' %} &bull; {{ item.badge }}{% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="course-description-content">{{ item.description or 'No additional description provided for this book.' }}</div>
+
+                                    <div>
+                                        <a href="{{ url_for('public.elibrary') }}" class="course-back-btn">
+                                            <i class="zmdi zmdi-chevron-left"></i> Back to E-Library
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Side: Other books — same cards design on all screens -->
+                        <div class="course-detail-side">
+                            <span class="side-div-title">Other Books</span>
+                            {% if related %}
+                                {% for b in related[:20] %}
+                                <div class="side-course-card">
+                                    <div class="side-course-thumb-wrap">
+                                        <a href="{{ url_for('public.book_detail', book_id=b.id) }}">
+                                            <img class="side-course-thumb" src="{{ b.image or url_for('static', filename='img/product/16.jpg') }}" alt="{{ b.title }}" loading="lazy" decoding="async">
+                                        </a>
+                                    </div>
+                                    <div class="side-course-body">
+                                        <a href="{{ url_for('public.book_detail', book_id=b.id) }}" class="side-course-title">{{ b.title }}</a>
+                                        <a href="{{ url_for('public.book_detail', book_id=b.id) }}" class="side-course-btn">View Book</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="side-course-card">
+                                    <div class="side-course-body text-center">
+                                        <p style="font-size:11px;color:#6b7280;margin:0;">No other books</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+    {% include 'includes/scripts.html' %}
+</body>
+</html>

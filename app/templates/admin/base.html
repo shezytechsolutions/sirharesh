@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Admin{% endblock %} - AIMS Sukkur</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin.css') }}?v=3.1">
+{% block head %}{% endblock %}
+</head>
+<body>
+<form id="logoutForm" method="post" action="{{ url_for('admin.admin_logout') }}" style="display:none"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"></form>
+
+{% macro nav_link(endpoint, icon, label) -%}
+<a href="{{ url_for(endpoint) }}" class="nav-link {{ 'active' if request.endpoint == endpoint }}" data-label="{{ label|lower }}">
+  <i class="fa {{ icon }}"></i><span>{{ label }}</span>
+</a>
+{%- endmacro %}
+
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <a href="{{ url_for('admin.admin_dashboard') }}" class="sidebar-brand" title="{{ settings.get('site_name') or 'AIMS Sukkur' }}">
+      <img src="{{ settings.get('footer_logo') or settings.get('header_logo') or url_for('static', filename='img/logo/footer.png') }}"
+           alt="{{ settings.get('site_name') or 'AIMS Sukkur' }}"
+           class="sidebar-brand-logo"
+           onerror="this.src='{{ url_for('static', filename='img/logo/footer.png') }}'">
+    </a>
+    <div class="sidebar-scroll">
+      <div class="sidebar-search-wrap">
+        <i class="fa fa-magnifying-glass"></i>
+        <input type="search" id="sidebarSearch" placeholder="Search menu…" autocomplete="off" aria-label="Search admin menu">
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>{{ nav_link('admin.admin_dashboard','fa-gauge','Dashboard') }}</li>
+      </ul>
+
+      <div class="nav-accordion" data-group="content">
+        <button type="button" class="nav-accordion-btn" aria-expanded="true">
+          <i class="fa fa-folder-open"></i>
+          <span class="nav-accordion-label">Content</span>
+          <i class="fa fa-chevron-down chev"></i>
+        </button>
+        <div class="nav-accordion-body open">
+          <ul class="sidebar-nav">
+            <li>{{ nav_link('admin.admin_news','fa-newspaper','News') }}</li>
+            <li>{{ nav_link('admin.admin_courses','fa-graduation-cap','Courses') }}</li>
+            <li>{{ nav_link('admin.admin_upcoming_courses','fa-calendar-plus','Upcoming courses') }}</li>
+            <li>{{ nav_link('admin.admin_events','fa-calendar-days','Events') }}</li>
+            <li>{{ nav_link('admin.admin_elibrary','fa-book','E-Library') }}</li>
+            <li>{{ nav_link('admin.admin_learning_videos','fa-video','Learning videos') }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="nav-accordion is-open" data-group="website">
+        <button type="button" class="nav-accordion-btn" aria-expanded="true">
+          <i class="fa fa-globe"></i>
+          <span class="nav-accordion-label">Website</span>
+          <i class="fa fa-chevron-down chev"></i>
+        </button>
+        <div class="nav-accordion-body open">
+          <ul class="sidebar-nav">
+            <li>{{ nav_link('admin.admin_homepage','fa-house','Homepage') }}</li>
+            <li>{{ nav_link('admin.admin_about','fa-circle-info','About page') }}</li>
+            <li>{{ nav_link('admin.admin_header','fa-window-maximize','Header') }}</li>
+            <li>{{ nav_link('admin.admin_footer','fa-window-minimize','Footer') }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-foot">
+      <a href="{{ url_for('admin.admin_logout') }}" onclick="document.getElementById('logoutForm').submit();return false;"><i class="fa fa-right-from-bracket"></i><span>Log out</span></a>
+    </div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu"><i class="fa fa-bars"></i></button>
+        <a class="visit" href="{{ url_for('public.index') }}" target="_blank" title="View live website">
+          <i class="fa fa-arrow-up-right-from-square"></i><span class="visit-text"> View website</span>
+        </a>
+      </div>
+      <div class="topbar-right">
+        <div class="user-dropdown-wrap" id="userDropdownWrap">
+          <button class="user-chip" id="userDropdownBtn" aria-haspopup="true" aria-expanded="false" type="button" title="Admin control panel">
+            <span class="avatar">{{ session.get('admin_username','A')[:1]|upper }}</span>
+            <span class="name">{{ session.get('admin_username','Admin') }}</span>
+          </button>
+        </div>
+        <a href="{{ url_for('admin.admin_messages') }}" class="notif-btn" id="msgBtn" aria-label="Messages" title="Messages" style="text-decoration:none;">
+          <i class="fa fa-envelope"></i>
+          <span class="notif-badge" id="msgBadge" {% if not unread_messages_count %}hidden{% endif %}>{{ unread_messages_count if unread_messages_count <= 9 else '9+' }}</span>
+        </a>
+        <div class="notif-wrap" id="notifWrap">
+          <button type="button" class="notif-btn" id="notifBtn" aria-label="Notifications" aria-expanded="false" title="Notifications">
+            <i class="fa fa-bell"></i>
+            <span class="notif-badge" id="notifBadge" {% if not unread_notif_count %}hidden{% endif %}>{{ unread_notif_count if unread_notif_count <= 9 else '9+' }}</span>
+          </button>
+          <div class="notif-panel" id="notifPanel" hidden>
+            <div class="notif-panel-head">
+              <strong>Notifications</strong>
+              <a href="{{ url_for('admin.admin_notifications') }}">View all</a>
+            </div>
+            <div class="notif-panel-body" id="notifList">
+              <div class="notif-empty">Loading…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Admin Right-Side Drawer Sidebar -->
+    <div class="admin-drawer-overlay" id="adminDrawerOverlay"></div>
+    <aside class="admin-drawer" id="adminDrawer" aria-label="Admin control panel">
+      <div class="admin-drawer-header">
+        <div class="admin-drawer-profile">
+          <span class="admin-drawer-avatar">{{ session.get('admin_username','A')[:1]|upper }}</span>
+          <span class="admin-drawer-name">{{ session.get('admin_username','Admin') }}</span>
+        </div>
+        <button type="button" class="admin-drawer-close" id="adminDrawerClose" aria-label="Close admin menu">
+          <i class="fa fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="admin-drawer-body">
+        <ul class="admin-drawer-nav">
+          <li>
+            <a href="{{ url_for('admin.admin_settings') }}" class="admin-drawer-link">
+              <i class="fa fa-gear"></i><span>Settings</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('admin.admin_messages') }}" class="admin-drawer-link">
+              <i class="fa fa-envelope"></i><span>Messages</span>
+              <span class="drawer-badge" id="drawerMsgBadge" {% if not unread_messages_count %}hidden{% endif %}>{{ unread_messages_count if unread_messages_count <= 9 else '9+' }}</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('admin.admin_notifications') }}" class="admin-drawer-link">
+              <i class="fa fa-bell"></i><span>Notification</span>
+              <span class="drawer-badge" id="drawerNotifBadge" {% if not unread_notif_count %}hidden{% endif %}>{{ unread_notif_count if unread_notif_count <= 9 else '9+' }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="content {% block content_class %}{% endblock %}">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<!-- Toast container (popup alerts) -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Live Message Alert Popup -->
+<div class="admin-msg-alert" id="adminMsgAlert" hidden role="alert" aria-live="assertive">
+  <div class="admin-msg-alert-header">
+    <div class="admin-msg-alert-title">
+      <i class="fa fa-envelope-open-text"></i>
+      <span>New Message Received</span>
+    </div>
+    <button type="button" class="admin-msg-alert-close" id="adminMsgAlertClose" aria-label="Dismiss">&times;</button>
+  </div>
+  <div class="admin-msg-alert-body">
+    <div class="admin-msg-alert-sender" id="adminMsgAlertSender"></div>
+    <div class="admin-msg-alert-text" id="adminMsgAlertText"></div>
+    <div class="admin-msg-alert-time" id="adminMsgAlertTime"></div>
+  </div>
+  <div class="admin-msg-alert-footer">
+    <a href="{{ url_for('admin.admin_messages') }}" class="admin-msg-alert-btn view-btn">
+      <i class="fa fa-envelope"></i> Open Messages
+    </a>
+    <button type="button" class="admin-msg-alert-btn dismiss-btn" id="adminMsgAlertDismiss">Dismiss</button>
+  </div>
+</div>
+
+<!-- Flash messages as data for JS toasts -->
+<script id="flashData" type="application/json">
+{% set flashes = [] %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    {% set _ = flashes.append({'category': category, 'message': message}) %}
+  {% endfor %}
+{% endwith %}
+{{ flashes|tojson }}
+</script>
+
+<!-- Global Settings Overlay Modal -->
+<div class="modal-overlay" id="settingsOverlayModal" role="dialog" aria-modal="true">
+  <div class="modal-content" style="max-width: 720px;">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:34px;height:34px;border-radius:8px;background:#eef2fb;color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px;">
+          <i class="fa fa-gear" style="color:var(--accent-dark);"></i>
+        </span>
+        <div>
+          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:0;">Site &amp; Contact Settings</h3>
+          <small style="color:var(--muted);font-size:12px;">Update website details displayed on headers, contact page and footer</small>
+        </div>
+      </div>
+      <button type="button" class="modal-close" id="closeSettingsOverlayBtn" aria-label="Close settings">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form method="post" action="{{ url_for('admin.admin_settings') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-grid">
+          <div>
+            <label>Site Name / Brand</label>
+            <input type="text" name="site_name" value="{{ settings.get('site_name', 'AIMS Sukkur') }}" required>
+          </div>
+          <div>
+            <label>Helpline Phone Number</label>
+            <input type="text" name="phone" value="{{ settings.get('phone', '') }}">
+          </div>
+          <div>
+            <label>Contact Email</label>
+            <input type="email" name="email" value="{{ settings.get('email', '') }}">
+          </div>
+          <div>
+            <label>Working hours</label>
+            <input type="text" name="working_hours" value="{{ settings.get('working_hours', '') }}">
+          </div>
+          <div class="full">
+            <label>Address</label>
+            <input type="text" name="address" value="{{ settings.get('address', '') }}">
+          </div>
+          <div class="full">
+            <label>Footer about text</label>
+            <textarea name="footer_about" rows="2">{{ settings.get('footer_about', '') }}</textarea>
+          </div>
+          <div>
+            <label>Facebook URL</label>
+            <input type="text" name="facebook" value="{{ settings.get('facebook', '') }}">
+          </div>
+          <div>
+            <label>Twitter / X URL</label>
+            <input type="text" name="twitter" value="{{ settings.get('twitter', '') }}">
+          </div>
+          <div>
+            <label>Instagram URL</label>
+            <input type="text" name="instagram" value="{{ settings.get('instagram', '') }}">
+          </div>
+          <div>
+            <label>YouTube URL</label>
+            <input type="text" name="youtube" value="{{ settings.get('youtube', '') }}">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelSettingsOverlayBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var s = document.getElementById('sidebar');
+  var o = document.getElementById('overlay');
+  var toggleBtn = document.getElementById('menuToggle');
+
+  function toggle(force){
+    var open = typeof force === 'boolean' ? force : !s.classList.contains('open');
+    s.classList.toggle('open', open);
+    if (o) o.classList.toggle('show', open);
+    document.body.classList.toggle('sidebar-open', open);
+  }
+  if (toggleBtn) toggleBtn.addEventListener('click', function(){ toggle(); });
+  if (o) o.addEventListener('click', function(){ toggle(false); });
+
+  /* Accordion nav groups */
+  document.querySelectorAll('.nav-accordion-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var body = btn.parentElement.querySelector('.nav-accordion-body');
+      var open = body.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.parentElement.classList.toggle('is-open', open);
+    });
+  });
+  /* Auto-open group that contains the active link */
+  document.querySelectorAll('.nav-accordion').forEach(function(acc){
+    if (acc.querySelector('.nav-link.active')) {
+      var body = acc.querySelector('.nav-accordion-body');
+      var btn = acc.querySelector('.nav-accordion-btn');
+      if (body && !body.classList.contains('open')) {
+        body.classList.add('open');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+        acc.classList.add('is-open');
+      }
+    }
+  });
+
+  /* Sidebar search */
+  var search = document.getElementById('sidebarSearch');
+  if (search) {
+    search.addEventListener('input', function(){
+      var q = (search.value || '').toLowerCase().trim();
+      document.querySelectorAll('.sidebar-nav .nav-link').forEach(function(a){
+        var label = a.getAttribute('data-label') || a.textContent.toLowerCase();
+        var show = !q || label.indexOf(q) !== -1;
+        a.parentElement.style.display = show ? '' : 'none';
+      });
+      if (q) {
+        document.querySelectorAll('.nav-accordion-body').forEach(function(b){ b.classList.add('open'); });
+      }
+    });
+  }
+
+  /* Admin Right-Side Drawer Sidebar */
+  var adminDrawer = document.getElementById('adminDrawer');
+  var adminDrawerOverlay = document.getElementById('adminDrawerOverlay');
+  var adminDrawerBtn = document.getElementById('userDropdownBtn');
+  var adminDrawerClose = document.getElementById('adminDrawerClose');
+
+  function openAdminDrawer() {
+    if (adminDrawer) adminDrawer.classList.add('open');
+    if (adminDrawerOverlay) adminDrawerOverlay.classList.add('active');
+    if (adminDrawerBtn) adminDrawerBtn.setAttribute('aria-expanded', 'true');
+    closeNotif();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAdminDrawer() {
+    if (adminDrawer) adminDrawer.classList.remove('open');
+    if (adminDrawerOverlay) adminDrawerOverlay.classList.remove('active');
+    if (adminDrawerBtn) adminDrawerBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  if (adminDrawerBtn) {
+    adminDrawerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (adminDrawer && adminDrawer.classList.contains('open')) {
+        closeAdminDrawer();
+      } else {
+        openAdminDrawer();
+      }
+    });
+  }
+
+  if (adminDrawerClose) {
+    adminDrawerClose.addEventListener('click', closeAdminDrawer);
+  }
+
+  if (adminDrawerOverlay) {
+    adminDrawerOverlay.addEventListener('click', closeAdminDrawer);
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') {
+      toggle(false);
+      closeAdminDrawer();
+      document.querySelectorAll('.modal-overlay').forEach(function(m){ m.classList.remove('active'); m.style.display = 'none'; });
+      closeNotif();
+    }
+  });
+  window.addEventListener('click', function(e){
+    if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+      e.target.classList.remove('active');
+      e.target.style.display = 'none';
+    }
+  });
+
+  if (s) {
+    s.querySelectorAll('.sidebar-nav a').forEach(function(l){
+      l.addEventListener('click', function(){ if (window.innerWidth <= 900) toggle(false); });
+    });
+  }
+
+  /* ---- Toast popup alerts ---- */
+  function showToast(message, category) {
+    var map = { success: 'ok', info: 'info', warning: 'warn', danger: 'danger', error: 'danger' };
+    var kind = map[category] || 'info';
+    var icons = { ok: 'fa-circle-check', info: 'fa-circle-info', warn: 'fa-triangle-exclamation', danger: 'fa-circle-xmark' };
+    var el = document.createElement('div');
+    el.className = 'toast toast-' + kind;
+    el.innerHTML = '<i class="fa ' + (icons[kind] || 'fa-circle-info') + '"></i><span class="toast-msg"></span><button type="button" class="toast-close" aria-label="Dismiss">&times;</button>';
+    el.querySelector('.toast-msg').textContent = message;
+    var box = document.getElementById('toastContainer');
+    box.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+    var timer = setTimeout(function(){ dismiss(el); }, 4500);
+    el.querySelector('.toast-close').addEventListener('click', function(){ clearTimeout(timer); dismiss(el); });
+  }
+  function dismiss(el) {
+    el.classList.remove('show');
+    setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 280);
+  }
+  try {
+    var flashes = JSON.parse(document.getElementById('flashData').textContent || '[]');
+    flashes.forEach(function(f){ showToast(f.message, f.category); });
+  } catch (e) {}
+  window.adminToast = showToast;
+
+  /* ---- Notifications bell & Message Alert Popup ---- */
+  var notifBtn = document.getElementById('notifBtn');
+  var notifPanel = document.getElementById('notifPanel');
+  var notifList = document.getElementById('notifList');
+  var notifBadge = document.getElementById('notifBadge');
+  var notifWrap = document.getElementById('notifWrap');
+  var msgBadge = document.getElementById('msgBadge');
+  var drawerMsgBadge = document.getElementById('drawerMsgBadge');
+  var drawerNotifBadge = document.getElementById('drawerNotifBadge');
+
+  function closeNotif() {
+    if (notifPanel) notifPanel.hidden = true;
+    if (notifBtn) notifBtn.setAttribute('aria-expanded', 'false');
+  }
+  function openNotif() {
+    if (notifPanel) notifPanel.hidden = false;
+    if (notifBtn) notifBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function checkoutNotifications() {
+    if (notifBadge) {
+      notifBadge.textContent = '0';
+      notifBadge.hidden = true;
+    }
+    if (drawerNotifBadge) {
+      drawerNotifBadge.textContent = '0';
+      drawerNotifBadge.hidden = true;
+    }
+    fetch('{{ url_for("admin.admin_api_notifications_checkout") }}?type=notifications', {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': '{{ csrf_token() }}'
+      },
+      credentials: 'same-origin'
+    }).catch(function(){});
+  }
+  window.checkoutNotifications = checkoutNotifications;
+
+  function checkoutMessages() {
+    if (msgBadge) {
+      msgBadge.textContent = '0';
+      msgBadge.hidden = true;
+    }
+    if (drawerMsgBadge) {
+      drawerMsgBadge.textContent = '0';
+      drawerMsgBadge.hidden = true;
+    }
+    fetch('{{ url_for("admin.admin_api_notifications_checkout") }}?type=messages', {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': '{{ csrf_token() }}'
+      },
+      credentials: 'same-origin'
+    }).catch(function(){});
+  }
+  window.checkoutMessages = checkoutMessages;
+
+  if (notifBtn) {
+    notifBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      if (notifPanel.hidden) {
+        openNotif();
+        checkoutNotifications();
+        loadNotifs();
+      } else {
+        closeNotif();
+      }
+    });
+    document.addEventListener('click', function(e){
+      if (notifWrap && !notifWrap.contains(e.target)) closeNotif();
+    });
+  }
+
+  /* Audio chime for alert */
+  function playAlertChime() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch(e) {}
+  }
+
+  /* Message popup alert */
+  var lastAlertedMsgId = localStorage.getItem('aims_last_alerted_msg');
+  function showMessagePopup(msg) {
+    if (!msg || !msg.is_new) return;
+    if (lastAlertedMsgId && String(msg.id) === String(lastAlertedMsgId)) return;
+
+    lastAlertedMsgId = String(msg.id);
+    localStorage.setItem('aims_last_alerted_msg', lastAlertedMsgId);
+
+    var el = document.getElementById('adminMsgAlert');
+    if (!el) return;
+
+    var senderEl = document.getElementById('adminMsgAlertSender');
+    var textEl = document.getElementById('adminMsgAlertText');
+    var timeEl = document.getElementById('adminMsgAlertTime');
+
+    if (senderEl) senderEl.textContent = msg.name + (msg.subject ? ' — ' + msg.subject : '');
+    if (textEl) textEl.textContent = msg.message;
+    if (timeEl) timeEl.textContent = msg.created_at || 'Just now';
+
+    el.hidden = false;
+    setTimeout(function(){ el.classList.add('show'); }, 20);
+    playAlertChime();
+
+    clearTimeout(window._msgAlertTimer);
+    window._msgAlertTimer = setTimeout(function(){
+      closeMessagePopup();
+    }, 15000);
+  }
+
+  function closeMessagePopup() {
+    var el = document.getElementById('adminMsgAlert');
+    if (el) {
+      el.classList.remove('show');
+      setTimeout(function(){ el.hidden = true; }, 300);
+    }
+  }
+
+  var msgAlertClose = document.getElementById('adminMsgAlertClose');
+  var msgAlertDismiss = document.getElementById('adminMsgAlertDismiss');
+  if (msgAlertClose) msgAlertClose.addEventListener('click', closeMessagePopup);
+  if (msgAlertDismiss) msgAlertDismiss.addEventListener('click', closeMessagePopup);
+
+  function loadNotifs() {
+    fetch('{{ url_for("admin.admin_api_notifications") }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        // 1. Independent Notification Badges (Bell & Drawer)
+        var notifCount = typeof data.notif_count !== 'undefined' ? data.notif_count : (data.count || 0);
+        var notifDisplay = notifCount > 9 ? '9+' : String(notifCount);
+        if (notifBadge) {
+          if (notifCount > 0) {
+            notifBadge.hidden = false;
+            notifBadge.textContent = notifDisplay;
+          } else {
+            notifBadge.hidden = true;
+            notifBadge.textContent = '0';
+          }
+        }
+        if (drawerNotifBadge) {
+          if (notifCount > 0) {
+            drawerNotifBadge.hidden = false;
+            drawerNotifBadge.textContent = notifDisplay;
+          } else {
+            drawerNotifBadge.hidden = true;
+            drawerNotifBadge.textContent = '0';
+          }
+        }
+
+        // 2. Independent Messages Badges (Envelope & Drawer)
+        var msgCount = typeof data.messages_count !== 'undefined' ? data.messages_count : 0;
+        var msgDisplay = msgCount > 9 ? '9+' : String(msgCount);
+        if (msgBadge) {
+          if (msgCount > 0) {
+            msgBadge.hidden = false;
+            msgBadge.textContent = msgDisplay;
+          } else {
+            msgBadge.hidden = true;
+            msgBadge.textContent = '0';
+          }
+        }
+        if (drawerMsgBadge) {
+          if (msgCount > 0) {
+            drawerMsgBadge.hidden = false;
+            drawerMsgBadge.textContent = msgDisplay;
+          } else {
+            drawerMsgBadge.hidden = true;
+            drawerMsgBadge.textContent = '0';
+          }
+        }
+
+        // Pop up message alert when new message is detected
+        if (data.latest_message && data.latest_message.is_new) {
+          showMessagePopup(data.latest_message);
+        }
+
+        if (!data.items || !data.items.length) {
+          if (notifList) notifList.innerHTML = '<div class="notif-empty">No notifications</div>';
+          return;
+        }
+        if (notifList) {
+          notifList.innerHTML = data.items.map(function(it){
+            var icon = it.type === 'message' ? 'fa-envelope' : 'fa-chart-line';
+            var newTag = it.is_new ? '<span class="notif-tag-new">NEW</span>' : '';
+            return '<a class="notif-item ' + (it.is_new ? 'notif-unread' : '') + '" href="' + (it.url || '#') + '">' +
+              '<i class="fa ' + icon + '"></i>' +
+              '<div><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><strong>' + escapeHtml(it.title) + '</strong>' + newTag + '</div>' +
+              '<span>' + escapeHtml(it.body || '') + '</span><small>' + escapeHtml(it.at || '') + '</small></div></a>';
+          }).join('');
+        }
+      })
+      .catch(function(){
+        if (notifList) notifList.innerHTML = '<div class="notif-empty">Could not load notifications</div>';
+      });
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; });
+  }
+  loadNotifs();
+  setInterval(loadNotifs, 15000);
+})();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

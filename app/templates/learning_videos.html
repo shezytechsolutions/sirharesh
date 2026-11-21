@@ -1,0 +1,323 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Learning Videos - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}">
+</head>
+
+<body>
+    <div class="loading">
+        <div class="text-center middle">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="as-mainwrapper">
+        <div class="bg-white">
+
+            {% include 'includes/header.html' %}
+
+            <!-- Page Banner Area -->
+            <div class="page-banner-area"
+                style="background-image:url({{ url_for('static', filename='img/banner/logo101.png') }});">
+                <div class="container">
+                    <div class="page-banner-content">
+                        <h1>LEARNING VIDEOS</h1>
+                        <ul class="page-breadcrumb">
+                            <li><a href="{{ url_for('public.index') }}">Home</a></li>
+                            <li>Learning Videos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Content Area -->
+            <div class="course-area section-padding reveal-on-scroll">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title-wrapper">
+                                <div class="section-title">
+                                    <h3>LEARNING VIDEOS</h3>
+                                    <p>Watch helpful lectures, technical tutorials, and masterclasses from YouTube</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Pills & Search Filter Bar -->
+                    <div class="video-filter-bar">
+                        <div class="video-cat-pills" id="videoCatPills">
+                            <button type="button" class="video-cat-btn active" data-cat="all">All ({{ videos|length }})</button>
+                            {% for c in categories %}
+                            <button type="button" class="video-cat-btn" data-cat="{{ c|lower }}">{{ c }}</button>
+                            {% endfor %}
+                        </div>
+                        <div class="video-search-wrap">
+                            <i class="fa fa-search"></i>
+                            <input type="text" id="videoSearchInput" placeholder="Search videos or instructors..." autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- Video Grid -->
+                    <div class="row" id="videoGridRow">
+                        {% if videos %}
+                            {% for v in videos %}
+                            <div class="col-lg-4 col-md-6 col-12 video-col"
+                                 data-category="{{ (v.category or '')|lower }}"
+                                 data-title="{{ v.title|lower }}"
+                                 data-instructor="{{ (v.instructor or '')|lower }}"
+                                 data-description="{{ (v.description or '')|lower }}">
+                                <div class="learning-video-card"
+                                     data-video-id="{{ v.resolved_video_id }}"
+                                     data-title="{{ v.title }}"
+                                     data-category="{{ v.category or 'General' }}"
+                                     data-instructor="{{ v.instructor or '' }}"
+                                     data-duration="{{ v.duration or '' }}"
+                                     data-description="{{ v.description or '' }}">
+                                    
+                                    <div class="lv-thumb-wrap open-video-trigger" title="Click to watch video">
+                                        <img src="{{ v.thumbnail_url }}" alt="{{ v.title }}" class="lv-thumb-img" onerror="this.src='https://img.youtube.com/vi/{{ v.resolved_video_id }}/mqdefault.jpg'" loading="lazy" decoding="async">
+                                        {% if v.category %}
+                                        <span class="lv-badge-cat">{{ v.category }}</span>
+                                        {% endif %}
+                                        {% if v.duration %}
+                                        <span class="lv-badge-dur"><i class="fa fa-clock-o"></i> {{ v.duration }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="lv-body">
+                                        {% if v.instructor %}
+                                        <div class="lv-meta">
+                                            <i class="fa fa-user-circle"></i>
+                                            <span>{{ v.instructor }}</span>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <h4 class="lv-title open-video-trigger" title="{{ v.title }}">{{ v.title }}</h4>
+                                        
+                                        {% if v.description %}
+                                        <p class="lv-desc">{{ v.description }}</p>
+                                        {% endif %}
+
+                                        <div class="lv-footer">
+                                            <button type="button" class="lv-watch-btn open-video-trigger">
+                                                <i class="fa fa-video"></i> Watch Video
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12 text-center" style="padding: 40px 0;">
+                                <p style="font-size: 16px; color: #64748b;">No learning videos published yet. Check back soon!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- No Results Match State -->
+                    <div id="noMatchMessage" style="display: none; text-align: center; padding: 40px 0;">
+                        <i class="fa fa-film" style="font-size: 40px; color: #cbd5e1; margin-bottom: 12px; display: block;"></i>
+                        <h4 style="color: #1F3971; font-weight: 700;">No matching videos found</h4>
+                        <p style="color: #64748b;">Try adjusting your search query or select another category above.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Lightbox Overlay for Video Playback (Plays without redirecting) -->
+            <div class="video-lightbox-overlay" id="videoLightboxModal" role="dialog" aria-modal="true" aria-hidden="true">
+                <div class="video-lightbox-dialog" id="videoLightboxDialog">
+                    <div class="video-lightbox-head">
+                        <div class="video-lightbox-title-wrap">
+                            <span class="video-lightbox-cat" id="modalVideoCat">Video</span>
+                            <h3 class="video-lightbox-title" id="modalVideoTitle">Watch Video</h3>
+                        </div>
+                        <button type="button" class="video-lightbox-close" id="modalVideoClose" aria-label="Close video">&times;</button>
+                    </div>
+                    
+                    <div class="video-lightbox-body">
+                        <div class="video-responsive-wrap">
+                            <iframe id="modalVideoIframe" src="" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="video-lightbox-foot" id="modalVideoFoot">
+                        <div class="video-lightbox-instructor" id="modalVideoInstructor">
+                            <i class="fa fa-graduation-cap"></i> <span id="modalVideoInstructorText"></span>
+                        </div>
+                        <p class="video-lightbox-desc" id="modalVideoDesc"></p>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+
+    {% include 'includes/scripts.html' %}
+
+    <script>
+    (function () {
+        // Lightbox Overlay elements
+        var modal = document.getElementById('videoLightboxModal');
+        var dialog = document.getElementById('videoLightboxDialog');
+        var iframe = document.getElementById('modalVideoIframe');
+        var closeBtn = document.getElementById('modalVideoClose');
+        var titleEl = document.getElementById('modalVideoTitle');
+        var catEl = document.getElementById('modalVideoCat');
+        var instWrap = document.getElementById('modalVideoInstructor');
+        var instText = document.getElementById('modalVideoInstructorText');
+        var descEl = document.getElementById('modalVideoDesc');
+
+        // Open Lightbox
+        function openVideoModal(data) {
+            if (!data.videoId) return;
+
+            // YouTube embed URL with autoplay and restricted related videos
+            var embedUrl = 'https://www.youtube.com/embed/' + data.videoId + '?autoplay=1&rel=0&modestbranding=1&enablejsapi=1';
+            iframe.src = embedUrl;
+
+            titleEl.textContent = data.title || 'Learning Video';
+            catEl.textContent = data.category || 'Lecture';
+
+            if (data.instructor && data.instructor.trim()) {
+                instText.textContent = data.instructor;
+                instWrap.style.display = 'flex';
+            } else {
+                instWrap.style.display = 'none';
+            }
+
+            if (data.description && data.description.trim()) {
+                descEl.textContent = data.description;
+                descEl.style.display = 'block';
+            } else {
+                descEl.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Lightbox (Stops video immediately)
+        function closeVideoModal() {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            iframe.src = ''; // Clears source so audio/video playback stops
+            document.body.style.overflow = '';
+        }
+
+        // Attach click listeners to all open-video triggers
+        document.addEventListener('click', function (e) {
+            var trigger = e.target.closest('.open-video-trigger');
+            if (trigger) {
+                e.preventDefault();
+                var card = trigger.closest('.learning-video-card');
+                if (card) {
+                    openVideoModal({
+                        videoId: card.getAttribute('data-video-id'),
+                        title: card.getAttribute('data-title'),
+                        category: card.getAttribute('data-category'),
+                        instructor: card.getAttribute('data-instructor'),
+                        duration: card.getAttribute('data-duration'),
+                        description: card.getAttribute('data-description')
+                    });
+                }
+            }
+        });
+
+        // Close button click
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeVideoModal();
+            });
+        }
+
+        // Close on clicking backdrop outside dialog
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    closeVideoModal();
+                }
+            });
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                closeVideoModal();
+            }
+        });
+
+        // Instant Filter & Live Search
+        var catButtons = document.querySelectorAll('.video-cat-btn');
+        var searchInput = document.getElementById('videoSearchInput');
+        var videoCols = document.querySelectorAll('.video-col');
+        var noMatchMsg = document.getElementById('noMatchMessage');
+        var activeCategory = 'all';
+
+        function filterVideos() {
+            var query = (searchInput.value || '').trim().toLowerCase();
+            var visibleCount = 0;
+
+            videoCols.forEach(function (col) {
+                var colCat = (col.getAttribute('data-category') || '').toLowerCase();
+                var colTitle = (col.getAttribute('data-title') || '').toLowerCase();
+                var colInst = (col.getAttribute('data-instructor') || '').toLowerCase();
+                var colDesc = (col.getAttribute('data-description') || '').toLowerCase();
+
+                var matchCat = (activeCategory === 'all') || (colCat === activeCategory);
+                var matchQuery = !query ||
+                                 colTitle.indexOf(query) !== -1 ||
+                                 colInst.indexOf(query) !== -1 ||
+                                 colDesc.indexOf(query) !== -1;
+
+                if (matchCat && matchQuery) {
+                    col.style.display = '';
+                    visibleCount++;
+                } else {
+                    col.style.display = 'none';
+                }
+            });
+
+            if (noMatchMsg) {
+                noMatchMsg.style.display = (visibleCount === 0 && videoCols.length > 0) ? 'block' : 'none';
+            }
+        }
+
+        catButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                catButtons.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                activeCategory = btn.getAttribute('data-cat');
+                filterVideos();
+            });
+        });
+
+        if (searchInput) {
+            searchInput.addEventListener('input', filterVideos);
+        }
+    })();
+    </script>
+</body>
+
+</html>
+

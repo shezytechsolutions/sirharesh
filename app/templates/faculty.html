@@ -1,0 +1,117 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Our Faculty - AIMS Sukkur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/material-design-iconic-font.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/plugin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/style.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/responsive.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/pages/faculty-7.css') }}?v=3.0">
+</head>
+<body>
+    <div class="loading"><div class="text-center middle"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div></div>
+    <div class="as-mainwrapper"><div class="bg-white">
+
+    {% include 'includes/header.html' %}
+
+    <div class="page-banner-area"
+        style="background-image:url({{ url_for('static', filename='img/banner/logo101.png') }});">
+        <div class="container">
+            <div class="page-banner-content">
+                <h1>OUR FACULTY</h1>
+                <ul class="page-breadcrumb">
+                    <li><a href="{{ url_for('public.index') }}">Home</a></li>
+                    <li>Faculty</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="teachers-area section-padding bg-white reveal-on-scroll">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="section-title-wrapper">
+                        <div class="section-title">
+                            <h3>MEET OUR TEAM</h3>
+                            <p>Experienced educators dedicated to your success</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {% if faculty_list %}
+                {% for f in faculty_list %}
+                <div class="col-lg-4 col-md-6 col-12 mb-30">
+                    <div class="fac-card">
+                        <!-- Top-left navy curved corner accent -->
+                        <svg class="fac-corner-accent" viewBox="0 0 100 100" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                            <path d="M0 0 H100 C60 0 0 60 0 100 Z" fill="#1E3A6D"/>
+                        </svg>
+
+                        <!-- Main top row: Avatar + Info (Full Width for Name) -->
+                        <div class="fac-main-row">
+                            <a href="{{ url_for('public.faculty_detail', member_id=f.id) }}" class="fac-avatar-wrap" title="View {{ f.name }}'s Profile">
+                                <img src="{{ f.image or url_for('static', filename='img/teacher/1.png') }}"
+                                     alt="{{ f.name }}"
+                                     class="fac-avatar-img"
+                                     onerror="this.src='{{ url_for('static', filename='img/teacher/1.png') }}'" loading="lazy" decoding="async">
+                            </a>
+                            <div class="fac-info">
+                                <h4 class="fac-name">
+                                    <a href="{{ url_for('public.faculty_detail', member_id=f.id) }}">{{ f.name }}</a>
+                                </h4>
+                                <div class="fac-role-pill">{{ f.role or 'Faculty' }}</div>
+                                <div class="fac-line"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom row: Qualification on left, Social Icons safely on right -->
+                        <div class="fac-bottom-row">
+                            <div class="fac-edu-wrap">
+                                <i class="fa fa-graduation-cap fac-edu-icon"></i>
+                                <span class="fac-edu-text">{{ f.qualification or 'Faculty Member, AIMS Sukkur' }}</span>
+                            </div>
+                            <div class="fac-socials">
+                                {% if f.linkedin %}
+                                <a href="{{ f.linkedin|safe_url }}" target="_blank" rel="noopener noreferrer" class="fac-social-btn" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
+                                {% else %}
+                                <a href="{{ url_for('public.faculty_detail', member_id=f.id) }}" class="fac-social-btn" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
+                                {% endif %}
+                                {% if f.twitter %}
+                                <a href="{{ f.twitter|safe_url }}" target="_blank" rel="noopener noreferrer" class="fac-social-btn" title="Twitter"><i class="fa fa-twitter"></i></a>
+                                {% elif f.facebook %}
+                                <a href="{{ f.facebook|safe_url }}" target="_blank" rel="noopener noreferrer" class="fac-social-btn" title="Facebook"><i class="fa fa-facebook"></i></a>
+                                {% else %}
+                                <a href="{{ url_for('public.faculty_detail', member_id=f.id) }}" class="fac-social-btn" title="Profile"><i class="fa fa-globe"></i></a>
+                                {% endif %}
+                                {% if f.email %}
+                                <a href="mailto:{{ f.email }}" class="fac-social-btn" title="Email"><i class="fa fa-envelope"></i></a>
+                                {% else %}
+                                <a href="{{ url_for('public.faculty_detail', member_id=f.id) }}" class="fac-social-btn" title="Email"><i class="fa fa-envelope"></i></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="col-12 text-center">
+                    <p>No faculty members listed yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% include 'includes/footer.html' %}
+    </div></div>
+    {% include 'includes/scripts.html' %}
+</body>
+</html>

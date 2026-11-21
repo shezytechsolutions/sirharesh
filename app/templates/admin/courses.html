@@ -1,0 +1,614 @@
+{% extends 'admin/base.html' %}
+{% block title %}Courses - Admin{% endblock %}
+{% block page_title %}Courses{% endblock %}
+
+{% block content %}
+<!-- Create Course Card -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-graduation-cap"></i></span>
+      <h2>Create Course</h2>
+    </div>
+  </div>
+  <div class="panel-body">
+    <form method="post" enctype="multipart/form-data" id="createCourseForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="add">
+
+      <div class="form-grid">
+        <div class="full">
+          <label class="form-label" for="courseTitle">Course title</label>
+          <input type="text" name="title" id="courseTitle" placeholder="e.g. Advanced Diploma in Information Technology" required autocomplete="off">
+        </div>
+
+        <div class="full">
+          <label class="form-label" for="courseDesc">Course description</label>
+          <textarea name="description" id="courseDesc" rows="4" placeholder="Comprehensive course overview, curriculum, target audience and outcomes..." required></textarea>
+        </div>
+
+        <div>
+          <label class="form-label" for="courseTeacher">Instructor name</label>
+          <input type="text" name="teacher" id="courseTeacher" placeholder="e.g. Prof. Derek Spafford">
+        </div>
+
+        <div>
+          <label class="form-label" for="courseTeacherRole">Instructor role</label>
+          <input type="text" name="teacher_role" id="courseTeacherRole" placeholder="Professor" value="Professor">
+        </div>
+
+        <div>
+          <label class="form-label" for="courseOrder">Display order</label>
+          <input type="number" name="order" id="courseOrder" value="0" min="0">
+        </div>
+
+        <!-- Course Syllabus / Outline PDF -->
+        <div>
+          <label class="form-label" for="coursePdf">Course syllabus (PDF)</label>
+          <input type="file" name="pdf" id="coursePdf" accept=".pdf,application/pdf">
+          <details style="font-size: 11.5px; color: var(--muted); margin-top: 4px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter PDF path / URL</summary>
+            <input type="text" name="pdf_path" placeholder="/static/uploads/courses/syllabus.pdf" style="margin-top: 4px;">
+          </details>
+        </div>
+
+        <!-- Course Poster Drag & Drop Zone -->
+        <div class="full">
+          <label class="form-label">Course poster</label>
+          <div class="upload-dropzone" id="createPosterDropzone">
+            <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+            <div class="dropzone-title">Upload course poster</div>
+            <div class="dropzone-hint">PNG, JPG or WEBP (Recommended: 800 × 500 px)</div>
+            <input type="file" name="image" id="createPosterInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+          </div>
+          <div class="dropzone-preview" id="createPosterPreview">
+            <img src="" alt="Poster Preview" class="dropzone-preview-img" id="createPosterPreviewImg">
+            <div class="dropzone-preview-info">
+              <div class="dropzone-preview-name" id="createPosterPreviewName">poster.jpg</div>
+              <div class="dropzone-preview-size" id="createPosterPreviewSize">—</div>
+            </div>
+            <button type="button" class="dropzone-preview-remove" id="createPosterPreviewRemove" title="Remove image">
+              <i class="fa fa-xmark"></i>
+            </button>
+          </div>
+          <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter poster image path / URL</summary>
+            <input type="text" name="image_path" id="createPosterPath" placeholder="/static/img/course/1.jpg" style="margin-top: 6px;">
+          </details>
+        </div>
+
+        <!-- Instructor Photo -->
+        <div class="full">
+          <label class="form-label">Instructor photo (Optional)</label>
+          <div class="upload-dropzone" id="createTeacherDropzone" style="padding: 16px;">
+            <i class="fa fa-user-circle dropzone-icon" style="font-size: 22px;"></i>
+            <div class="dropzone-title">Upload instructor photo</div>
+            <div class="dropzone-hint">Square 1:1 image recommended (e.g. 150 × 150 px)</div>
+            <input type="file" name="teacher_image" id="createTeacherInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+          </div>
+          <div class="dropzone-preview" id="createTeacherPreview">
+            <img src="" alt="Teacher Preview" class="dropzone-preview-img" id="createTeacherPreviewImg" style="width: 38px; height: 38px; border-radius: 50%;">
+            <div class="dropzone-preview-info">
+              <div class="dropzone-preview-name" id="createTeacherPreviewName">instructor.jpg</div>
+              <div class="dropzone-preview-size" id="createTeacherPreviewSize">—</div>
+            </div>
+            <button type="button" class="dropzone-preview-remove" id="createTeacherPreviewRemove" title="Remove photo">
+              <i class="fa fa-xmark"></i>
+            </button>
+          </div>
+          <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            <summary style="cursor: pointer; user-select: none;">Or enter instructor photo path / URL</summary>
+            <input type="text" name="teacher_image_path" id="createTeacherPath" placeholder="/static/img/teacher/1.png" style="margin-top: 6px;">
+          </details>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+        <label class="switch-label-wrap">
+          <input type="checkbox" name="show_on_home" class="switch-input" id="createShowHome" checked>
+          <span class="switch-slider"></span>
+          <span class="switch-text">Show on homepage</span>
+        </label>
+
+        <button type="submit" class="btn btn-blue" style="padding: 10px 24px; font-weight: 700;">
+          <i class="fa fa-plus"></i> Publish Course
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- All Courses List Card -->
+<div class="panel">
+  <div class="panel-head">
+    <div class="news-header-box">
+      <span class="news-header-icon"><i class="fa fa-graduation-cap"></i></span>
+      <h2>Courses</h2>
+      <span class="news-count-pill">{{ items|length }} Courses</span>
+    </div>
+  </div>
+
+  <div class="course-list" id="courseList">
+    {% for item in items %}
+    <div class="course-item-row" id="course-row-{{ item.id }}">
+      <!-- Thumbnail -->
+      {% if item.image %}
+      <img src="{{ item.image }}" alt="{{ item.title }}" class="course-thumb" onerror="this.onerror=null;this.src='/static/img/course/1.jpg';">
+      {% else %}
+      <div class="course-thumb-placeholder"><i class="fa fa-graduation-cap"></i></div>
+      {% endif %}
+
+      <!-- Info Cell (Title + Teacher + PDF + Home badge) -->
+      <div class="course-info-cell">
+        <span class="course-title-text" title="{{ item.title }}">{{ item.title }}</span>
+        <div class="course-meta-text">
+          {% if item.teacher %}
+          <span>
+            {% if item.teacher_image %}
+            <img src="{{ item.teacher_image }}" alt="" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 4px;">
+            {% else %}
+            <i class="fa fa-chalkboard-user"></i>
+            {% endif %}
+            {{ item.teacher }}{% if item.teacher_role %} <span style="opacity: 0.75;">({{ item.teacher_role }})</span>{% endif %}
+          </span>
+          {% endif %}
+
+          {% if item.pdf %}
+          <a href="{{ item.pdf|safe_url }}" target="_blank" class="meta-pdf-pill" title="View Syllabus PDF">
+            <i class="fa fa-file-pdf"></i> PDF
+          </a>
+          {% endif %}
+
+          {% if item.show_on_home %}
+          <span class="home-badge"><i class="fa fa-house"></i> Home</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- End of row: Status Pill + 3-dots Menu (strictly pinned at end) -->
+      <div class="course-end-group">
+        {% if item.is_active %}
+        <span class="status-pill status-visible" title="Visible on site">
+          <i class="fa fa-circle-check"></i> Visible
+        </span>
+        {% else %}
+        <span class="status-pill status-hidden" title="Hidden from site">
+          <i class="fa fa-eye-slash"></i> Hidden
+        </span>
+        {% endif %}
+
+        <div class="course-actions-cell">
+          <button type="button" class="btn-dots course-menu-trigger" data-target="course-dropdown-{{ item.id }}" title="Actions">
+            <i class="fa fa-ellipsis-vertical"></i>
+          </button>
+          <div class="news-menu-dropdown course-menu-dropdown" id="course-dropdown-{{ item.id }}">
+            <button type="button" class="news-menu-item edit-course-trigger"
+                    data-id="{{ item.id }}"
+                    data-title="{{ item.title|e }}"
+                    data-desc="{{ (item.description or '')|e }}"
+                    data-teacher="{{ (item.teacher or '')|e }}"
+                    data-role="{{ (item.teacher_role or 'Professor')|e }}"
+                    data-order="{{ item.order or 0 }}"
+                    data-image="{{ item.image or '' }}"
+                    data-teacher-img="{{ item.teacher_image or '' }}"
+                    data-pdf="{{ item.pdf or '' }}"
+                    data-home="{{ '1' if item.show_on_home else '0' }}">
+              <i class="fa fa-pen-to-square"></i> Edit
+            </button>
+
+            <form method="post" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item">
+                <i class="fa {{ 'fa-eye-slash' if item.is_active else 'fa-eye' }}"></i>
+                {{ 'Hide' if item.is_active else 'Show' }}
+              </button>
+            </form>
+
+            <form method="post" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this course?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <button type="submit" class="news-menu-item danger">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div style="padding: 36px 20px; text-align: center; color: var(--muted);">
+      <i class="fa fa-graduation-cap" style="font-size: 32px; opacity: 0.35; margin-bottom: 10px; display: block;"></i>
+      No courses published yet. Use the form above to add your first course.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Edit Course Modal -->
+<div class="modal-overlay" id="editCourseModal" style="display: none;">
+  <div class="modal-content" style="max-width: 680px;">
+    <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="news-header-icon" style="width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-pen-to-square"></i></span>
+        <h3>Edit Course</h3>
+      </div>
+      <button type="button" class="modal-close" id="closeEditCourseModal" aria-label="Close dialog">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form method="post" enctype="multipart/form-data" id="editCourseForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="id" id="editCourseId" value="">
+
+        <div class="form-grid">
+          <div class="full">
+            <label class="form-label" for="editTitle">Course title</label>
+            <input type="text" name="title" id="editTitle" required autocomplete="off">
+          </div>
+
+          <div class="full">
+            <label class="form-label" for="editDesc">Course description</label>
+            <textarea name="description" id="editDesc" rows="4" required></textarea>
+          </div>
+
+          <div>
+            <label class="form-label" for="editTeacher">Instructor name</label>
+            <input type="text" name="teacher" id="editTeacher">
+          </div>
+
+          <div>
+            <label class="form-label" for="editTeacherRole">Instructor role</label>
+            <input type="text" name="teacher_role" id="editTeacherRole">
+          </div>
+
+          <div>
+            <label class="form-label" for="editOrder">Display order</label>
+            <input type="number" name="order" id="editOrder" value="0" min="0">
+          </div>
+
+          <!-- Course Syllabus PDF in Modal -->
+          <div>
+            <label class="form-label">Course syllabus (PDF)</label>
+            <div id="editCurrentPdfWrap" style="font-size: 12px; margin-bottom: 6px; display: none;">
+              <span style="color: var(--muted);">Current: </span>
+              <a href="" target="_blank" id="editCurrentPdfLink" style="color: var(--secondary); font-weight: 600; text-decoration: underline;"></a>
+            </div>
+            <input type="file" name="pdf" id="editPdfInput" accept=".pdf,application/pdf">
+            <details style="font-size: 11.5px; color: var(--muted); margin-top: 4px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter PDF path / URL</summary>
+              <input type="text" name="pdf_path" id="editPdfPath" placeholder="/static/uploads/courses/syllabus.pdf" style="margin-top: 4px;">
+            </details>
+          </div>
+
+          <!-- Poster image in Modal -->
+          <div class="full">
+            <label class="form-label">Course poster</label>
+            <div id="editCurrentPosterWrap" style="display: none; align-items: center; gap: 12px; margin-bottom: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;">
+              <img src="" alt="Current Poster" id="editCurrentPosterImg" style="width: 58px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12.5px; font-weight: 600; color: var(--text);">Current poster</div>
+                <div style="font-size: 11.5px; color: var(--muted); word-break: break-all;" id="editCurrentPosterPath"></div>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="editPosterDropzone">
+              <i class="fa fa-cloud-arrow-up dropzone-icon"></i>
+              <div class="dropzone-title">Upload a new course poster</div>
+              <div class="dropzone-hint">PNG, JPG or WEBP (leave blank to keep current)</div>
+              <input type="file" name="image" id="editPosterInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+            </div>
+
+            <div class="dropzone-preview" id="editPosterPreview">
+              <img src="" alt="Preview" class="dropzone-preview-img" id="editPosterPreviewImg">
+              <div class="dropzone-preview-info">
+                <div class="dropzone-preview-name" id="editPosterPreviewName">poster.jpg</div>
+                <div class="dropzone-preview-size" id="editPosterPreviewSize">—</div>
+              </div>
+              <button type="button" class="dropzone-preview-remove" id="editPosterPreviewRemove" title="Remove selected image">
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+
+            <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter poster image path / URL</summary>
+              <input type="text" name="image_path" id="editPosterPathInput" placeholder="/static/img/course/1.jpg" style="margin-top: 6px;">
+            </details>
+          </div>
+
+          <!-- Instructor Photo in Modal -->
+          <div class="full">
+            <label class="form-label">Instructor photo (Optional)</label>
+            <div id="editCurrentTeacherWrap" style="display: none; align-items: center; gap: 12px; margin-bottom: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;">
+              <img src="" alt="Current Teacher" id="editCurrentTeacherImg" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12.5px; font-weight: 600; color: var(--text);">Current instructor photo</div>
+                <div style="font-size: 11.5px; color: var(--muted); word-break: break-all;" id="editCurrentTeacherPath"></div>
+              </div>
+            </div>
+
+            <div class="upload-dropzone" id="editTeacherDropzone" style="padding: 16px;">
+              <i class="fa fa-user-circle dropzone-icon" style="font-size: 22px;"></i>
+              <div class="dropzone-title">Upload new instructor photo</div>
+              <div class="dropzone-hint">Square 1:1 image recommended (leave blank to keep current)</div>
+              <input type="file" name="teacher_image" id="editTeacherInput" accept="image/png, image/jpeg, image/webp" class="dropzone-file-input">
+            </div>
+
+            <div class="dropzone-preview" id="editTeacherPreview">
+              <img src="" alt="Teacher Preview" class="dropzone-preview-img" id="editTeacherPreviewImg" style="width: 38px; height: 38px; border-radius: 50%;">
+              <div class="dropzone-preview-info">
+                <div class="dropzone-preview-name" id="editTeacherPreviewName">instructor.jpg</div>
+                <div class="dropzone-preview-size" id="editTeacherPreviewSize">—</div>
+              </div>
+              <button type="button" class="dropzone-preview-remove" id="editTeacherPreviewRemove" title="Remove photo">
+                <i class="fa fa-xmark"></i>
+              </button>
+            </div>
+
+            <details style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+              <summary style="cursor: pointer; user-select: none;">Or enter instructor photo path / URL</summary>
+              <input type="text" name="teacher_image_path" id="editTeacherPathInput" placeholder="/static/img/teacher/1.png" style="margin-top: 6px;">
+            </details>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px;">
+          <label class="switch-label-wrap">
+            <input type="checkbox" name="show_on_home" class="switch-input" id="editShowHome">
+            <span class="switch-slider"></span>
+            <span class="switch-text">Show on homepage</span>
+          </label>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" id="cancelEditCourseBtn">Cancel</button>
+            <button type="submit" class="btn btn-blue" style="padding: 10px 22px; font-weight: 700;">
+              <i class="fa fa-check"></i> Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // --- Helper for Drag & Drop + File Preview ---
+  function setupDropzone(dropzoneId, inputId, previewId, previewImgId, previewNameId, previewSizeId, removeBtnId) {
+    var dropzone = document.getElementById(dropzoneId);
+    var input = document.getElementById(inputId);
+    var preview = document.getElementById(previewId);
+    var previewImg = document.getElementById(previewImgId);
+    var previewName = document.getElementById(previewNameId);
+    var previewSize = document.getElementById(previewSizeId);
+    var removeBtn = document.getElementById(removeBtnId);
+
+    if (!dropzone || !input) return;
+
+    ['dragenter', 'dragover'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(function(eventName){
+      dropzone.addEventListener(eventName, function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', function(e){
+      var dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) {
+        input.files = dt.files;
+        handleFiles(input.files);
+      }
+    });
+
+    input.addEventListener('change', function(){
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      if (!files || !files.length) return;
+      var file = files[0];
+      if (previewName) previewName.textContent = file.name;
+      if (previewSize) previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+      var reader = new FileReader();
+      reader.onload = function(e){
+        if (previewImg) previewImg.src = e.target.result;
+        if (preview) preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        if (preview) preview.classList.remove('show');
+        if (previewImg) previewImg.src = '';
+      });
+    }
+  }
+
+  // Create dropzones
+  setupDropzone('createPosterDropzone', 'createPosterInput', 'createPosterPreview', 'createPosterPreviewImg', 'createPosterPreviewName', 'createPosterPreviewSize', 'createPosterPreviewRemove');
+  setupDropzone('createTeacherDropzone', 'createTeacherInput', 'createTeacherPreview', 'createTeacherPreviewImg', 'createTeacherPreviewName', 'createTeacherPreviewSize', 'createTeacherPreviewRemove');
+
+  // Edit dropzones
+  setupDropzone('editPosterDropzone', 'editPosterInput', 'editPosterPreview', 'editPosterPreviewImg', 'editPosterPreviewName', 'editPosterPreviewSize', 'editPosterPreviewRemove');
+  setupDropzone('editTeacherDropzone', 'editTeacherInput', 'editTeacherPreview', 'editTeacherPreviewImg', 'editTeacherPreviewName', 'editTeacherPreviewSize', 'editTeacherPreviewRemove');
+
+  // --- Three-Dots Dropdown Menu Toggle ---
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('.course-menu-trigger');
+    var isInsideDropdown = e.target.closest('.course-menu-dropdown');
+
+    if (trigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      var targetId = trigger.getAttribute('data-target');
+      var dropdown = document.getElementById(targetId);
+
+      // Close all other dropdowns
+      document.querySelectorAll('.course-menu-dropdown.show').forEach(function(d){
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        if (b !== trigger) b.classList.remove('active');
+      });
+
+      if (dropdown) {
+        var rect = trigger.getBoundingClientRect();
+        var spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 180 && rect.top > 180) {
+          dropdown.classList.add('dropup');
+        } else {
+          dropdown.classList.remove('dropup');
+        }
+        dropdown.classList.toggle('show');
+        trigger.classList.toggle('active');
+      }
+      return;
+    }
+
+    if (!isInsideDropdown) {
+      document.querySelectorAll('.course-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      document.querySelectorAll('.btn-dots.active').forEach(function(b){
+        b.classList.remove('active');
+      });
+    }
+  });
+
+  // --- Edit Course Modal Functionality ---
+  var editModal = document.getElementById('editCourseModal');
+  var closeBtn = document.getElementById('closeEditCourseModal');
+  var cancelBtn = document.getElementById('cancelEditCourseBtn');
+
+  function openEditModal(data) {
+    document.getElementById('editCourseId').value = data.id || '';
+    document.getElementById('editTitle').value = data.title || '';
+    document.getElementById('editDesc').value = data.desc || '';
+    document.getElementById('editTeacher').value = data.teacher || '';
+    document.getElementById('editTeacherRole').value = data.role || 'Professor';
+    document.getElementById('editOrder').value = data.order || 0;
+    document.getElementById('editShowHome').checked = (data.home === '1' || data.home === true);
+
+    // Reset file inputs & previews
+    ['editPosterInput', 'editTeacherInput', 'editPdfInput'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    ['editPosterPreview', 'editTeacherPreview'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('show');
+    });
+
+    // Poster preview
+    var posterWrap = document.getElementById('editCurrentPosterWrap');
+    var posterImg = document.getElementById('editCurrentPosterImg');
+    var posterPath = document.getElementById('editCurrentPosterPath');
+    var posterInput = document.getElementById('editPosterPathInput');
+    if (data.image) {
+      posterImg.src = data.image;
+      posterPath.textContent = data.image;
+      posterWrap.style.display = 'flex';
+      posterInput.value = data.image;
+    } else {
+      posterWrap.style.display = 'none';
+      posterInput.value = '';
+    }
+
+    // Teacher image preview
+    var teacherWrap = document.getElementById('editCurrentTeacherWrap');
+    var teacherImg = document.getElementById('editCurrentTeacherImg');
+    var teacherPath = document.getElementById('editCurrentTeacherPath');
+    var teacherInput = document.getElementById('editTeacherPathInput');
+    if (data.teacherImg) {
+      teacherImg.src = data.teacherImg;
+      teacherPath.textContent = data.teacherImg;
+      teacherWrap.style.display = 'flex';
+      teacherInput.value = data.teacherImg;
+    } else {
+      teacherWrap.style.display = 'none';
+      teacherInput.value = '';
+    }
+
+    // PDF status
+    var pdfWrap = document.getElementById('editCurrentPdfWrap');
+    var pdfLink = document.getElementById('editCurrentPdfLink');
+    var pdfPathInput = document.getElementById('editPdfPath');
+    if (data.pdf) {
+      pdfLink.href = data.pdf;
+      pdfLink.textContent = data.pdf.split('/').pop() || data.pdf;
+      pdfWrap.style.display = 'block';
+      pdfPathInput.value = data.pdf;
+    } else {
+      pdfWrap.style.display = 'none';
+      pdfPathInput.value = '';
+    }
+
+    editModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEditModal() {
+    editModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', function(e){
+    var editBtn = e.target.closest('.edit-course-trigger');
+    if (editBtn) {
+      e.preventDefault();
+      document.querySelectorAll('.course-menu-dropdown.show').forEach(function(d){
+        d.classList.remove('show');
+      });
+      var data = {
+        id: editBtn.getAttribute('data-id'),
+        title: editBtn.getAttribute('data-title'),
+        desc: editBtn.getAttribute('data-desc'),
+        teacher: editBtn.getAttribute('data-teacher'),
+        role: editBtn.getAttribute('data-role'),
+        order: editBtn.getAttribute('data-order'),
+        image: editBtn.getAttribute('data-image'),
+        teacherImg: editBtn.getAttribute('data-teacher-img'),
+        pdf: editBtn.getAttribute('data-pdf'),
+        home: editBtn.getAttribute('data-home')
+      };
+      openEditModal(data);
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
+
+  // Close modal when clicking backdrop
+  if (editModal) {
+    editModal.addEventListener('click', function(e){
+      if (e.target === editModal) {
+        closeEditModal();
+      }
+    });
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && editModal && editModal.style.display === 'flex') {
+      closeEditModal();
+    }
+  });
+})();
+</script>
+{% endblock %}

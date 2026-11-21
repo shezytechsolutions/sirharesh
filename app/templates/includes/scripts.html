@@ -1,0 +1,86 @@
+<!-- JS Files -->
+<script src="{{ url_for('static', filename='js/vendor/modernizr-3.6.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/jquery-migrate-3.3.2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ajax-mail.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plugins.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Mobile top bar: hamburger sidebar + search -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var hamburger = document.getElementById('mobileHamburger');
+    var sidebar = document.getElementById('mobileSidebar');
+    var overlay = document.getElementById('mobileSidebarOverlay');
+    var closeBtn = document.getElementById('mobileSidebarClose');
+
+    function openSidebar() {
+        if (sidebar) sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('open');
+        if (hamburger) hamburger.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+        if (hamburger) hamburger.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (hamburger) {
+        hamburger.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (sidebar && sidebar.classList.contains('open')) closeSidebar();
+            else openSidebar();
+        });
+    }
+    if (closeBtn) closeBtn.addEventListener('click', function (e) { e.preventDefault(); closeSidebar(); });
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', closeSidebar);
+        });
+    }
+
+    var searchToggle = document.getElementById('mobileSearchToggle');
+    var searchBox = document.getElementById('mobileSearchBox');
+    var searchClose = document.getElementById('mobileSearchClose');
+    var topbar = document.querySelector('.mobile-topbar-inner');
+
+    function openSearch() {
+        if (searchBox) searchBox.classList.add('open');
+        if (topbar) topbar.classList.add('search-open');
+        var input = document.getElementById('mobileSearchInput');
+        if (input) setTimeout(function () { input.focus(); }, 50);
+    }
+    function closeSearch() {
+        if (searchBox) searchBox.classList.remove('open');
+        if (topbar) topbar.classList.remove('search-open');
+    }
+    if (searchToggle) searchToggle.addEventListener('click', function (e) { e.preventDefault(); openSearch(); });
+    if (searchClose) searchClose.addEventListener('click', function (e) { e.preventDefault(); closeSearch(); });
+});
+</script>
+
+<!-- Scroll reveal -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var sections = document.querySelectorAll('.reveal-on-scroll');
+    if (!sections.length) return;
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { root: null, rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+        sections.forEach(function (el) { io.observe(el); });
+    } else {
+        sections.forEach(function (el) { el.classList.add('revealed'); });
+    }
+});
+</script>
